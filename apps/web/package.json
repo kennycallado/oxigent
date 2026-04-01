@@ -1,0 +1,26 @@
+{
+  "name": "@rust-kanban/web",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@rust-kanban/app-core": "workspace:*",
+    "@rust-kanban/ui": "workspace:*",
+    "@rust-kanban/platform-web": "workspace:*",
+    "@rust-kanban/feature-tasks": "workspace:*",
+    "@rust-kanban/feature-boards": "workspace:*",
+    "@rust-kanban/feature-projects": "workspace:*",
+    "@rust-kanban/feature-agents": "workspace:*",
+    "@rust-kanban/feature-settings": "workspace:*",
+    "lit": "^3.2.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "vite": "^6"
+  }
+}

@@ -1,0 +1,10 @@
+[package]
+name = "agent-execution"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+shared-kernel = { path = "../shared-kernel" }
+serde = { workspace = true }
+uuid = { workspace = true }
+tokio = { workspace = true }
