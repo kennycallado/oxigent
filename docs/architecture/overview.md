@@ -43,6 +43,10 @@
 │  └───────────────┘ └──────────┘ └────────────────┘ └─────────────┘  │
 │                                                                       │
 │  ┌─────────────────────────────────────────────────────────────────┐ │
+│  │  backend/crates/integrations   git sync, Jira, webhooks         │ │
+│  └─────────────────────────────────────────────────────────────────┘ │
+│                                                                       │
+│  ┌─────────────────────────────────────────────────────────────────┐ │
 │  │  backend/crates/shared-kernel   IDs, base event types, errors   │ │
 │  └─────────────────────────────────────────────────────────────────┘ │
 └───────────────────────────────────────────┬───────────────────────────┘
@@ -64,6 +68,7 @@
 |---|---|---|
 | General Architecture | — | [ADR-001](../adr/ADR-001-general-architecture.md) |
 | Bounded Contexts | `backend/crates/` | [ADR-002](../adr/ADR-002-bounded-contexts.md) |
+| Shared Kernel | `backend/crates/shared-kernel` | [ADR-002](../adr/ADR-002-bounded-contexts.md) |
 | Technology Stack | — | [ADR-003](../adr/ADR-003-technology-stack.md) |
 | Data Technology | SurrealDB | [ADR-004](../adr/ADR-004-data-technology.md) |
 | Offline & Sync | Outbox pattern | [ADR-005](../adr/ADR-005-offline-sync-strategy.md) |
@@ -73,7 +78,7 @@
 
 ## Backend Architecture
 
-Each bounded context crate follows the same internal layering:
+Each bounded context crate follows the same internal layering (target layout — the current scaffold may have flat files; this is the intended structure):
 
 ```
 backend/crates/<context>/
@@ -161,7 +166,7 @@ User triggers agent run
                → live query subscription updates UI in real time
 ```
 
-See [ADR-003](../adr/ADR-003-technology-stack.md) for Tauri capabilities constraints.
+See [ADR-003](../adr/ADR-003-technology-stack.md) for Tauri capabilities constraints. The agent execution flow uses Tauri commands — same transport contract as all other desktop operations; see [ADR-007](../adr/ADR-007-frontend-backend-api-contract.md).
 
 ## Offline Sync Flow (Desktop)
 

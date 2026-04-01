@@ -53,3 +53,5 @@ Shared vocabulary lives in `backend/crates/shared-kernel`: common value objects 
 **Harder:**
 - Cross-context queries require explicit projections or join services
 - Team must respect context boundaries — linter/module visibility rules should enforce this
+
+See [ADR-001](./ADR-001-general-architecture.md) for the overall modular monolith architecture, and [ADR-004](./ADR-004-data-technology.md) for the shared data technology used by all contexts.

@@ -58,3 +58,5 @@ Cargo workspace for Rust crates, pnpm workspaces for TypeScript packages/apps, N
 - Nix has a learning curve for contributors unfamiliar with it
 - pnpm workspace + Cargo workspace means two separate lock files to maintain
 - Initial Nix flake setup is non-trivial (Tauri system deps vary by OS)
+
+See [ADR-002](./ADR-002-bounded-contexts.md) for the backend crate structure, [ADR-003](./ADR-003-technology-stack.md) for the technology choices that shape the workspace members, and [ADR-006](./ADR-006-frontend-architecture.md) for the frontend package structure.

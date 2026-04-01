@@ -19,7 +19,7 @@ Feature code depends only on ports (TypeScript interfaces). Shell apps provide a
 
 ## Decision
 
-Package structure (already scaffolded in the monorepo):
+Package structure (scaffolded in the monorepo; see note below):
 
 ```
 packages/
@@ -39,7 +39,7 @@ apps/
   desktop/              # Desktop shell: composes platform-desktop adapters, injects into features at startup
 ```
 
-> Note: `packages/features/` packages reflect the current scaffold. A `planning` feature package will be added when the Planning bounded context is implemented.
+> Note: `packages/features/` currently contains: `agents`, `boards`, `projects`, `settings`, `tasks`. A `planning` feature package will be added when the Planning bounded context is implemented. All other packages listed above are present in the scaffold.
 
 **Dependency rule (enforced):** Feature packages (`packages/features/*`) may only import from `packages/app-core` and `packages/ui`. They must never import from `packages/platform-web` or `packages/platform-desktop`. Violations should be caught by TypeScript path aliases and linter rules.
 
