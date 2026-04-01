@@ -35,6 +35,8 @@ REST/Tauri commands for all mutations and auth. SurrealDB SDK for reads/subscrip
 
 **Type sharing:** Rust types in the `api` crate are annotated with `#[derive(Typeshare)]`. The Typeshare CLI generates TypeScript types into `packages/app-core/src/generated/`. SurrealDB schema types are defined in SurrealQL schema files and documented separately.
 
+**CI enforcement:** Every CI run executes `typeshare` and then checks that the working tree is clean (`git diff --exit-code packages/app-core/src/generated/`). The build fails if generated types are stale. Developers must re-run `typeshare` locally before pushing any commit that changes `#[derive(Typeshare)]`-annotated types.
+
 **Versioning:**
 - REST: URL-based (`/v1/...`)
 - Tauri commands: same version by convention (command names prefixed `v1_`)
@@ -50,5 +52,5 @@ See [ADR-006](./ADR-006-frontend-architecture.md) for the frontend package struc
 
 **Harder:**
 - Every new operation needs both a REST endpoint and a Tauri command (same handler, two registrations)
-- Typeshare requires running the codegen step when Rust API types change
+- Typeshare requires running the codegen step when Rust API types change; CI enforces freshness via `git diff --exit-code` on `packages/app-core/src/generated/`
 - SurrealDB schema types and Typeshare-generated types must stay in sync manually
