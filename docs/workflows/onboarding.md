@@ -11,6 +11,7 @@ All tools (Rust, Node, pnpm, Tauri dependencies) are provided by the flake — n
 installation of toolchains required.
 
 **Required:**
+
 - Nix with flakes enabled ([install guide](https://nixos.org/download))
 - [direnv](https://direnv.net/) (recommended, to auto-load the environment)
 
@@ -33,9 +34,9 @@ cd oxigent
 **With direnv (recommended):**
 
 ```bash
-echo "use flake" > .envrc
 direnv allow
-# The environment loads automatically on every cd into the directory
+# .envrc is already committed — just allow it once.
+# The environment loads automatically on every cd into the directory.
 ```
 
 **Without direnv:**
@@ -52,17 +53,17 @@ runs are instant thanks to sccache.
 
 ## What the flake provides
 
-| Tool | Purpose |
-|------|---------|
-| Rust (stable, latest) | Backend compiler |
-| rust-analyzer | LSP for editors |
-| cargo-watch | Auto-recompile on file change |
-| cargo-edit | `cargo add` / `cargo rm` |
-| bacon | Background cargo check runner |
-| Node.js 22 | Frontend runtime |
-| pnpm | Frontend package manager |
-| bun | Fast JS runtime (scripts) |
-| sccache | Rust build cache |
+| Tool                      | Purpose                            |
+| ------------------------- | ---------------------------------- |
+| Rust (stable, latest)     | Backend compiler                   |
+| rust-analyzer             | LSP for editors                    |
+| cargo-watch               | Auto-recompile on file change      |
+| cargo-edit                | `cargo add` / `cargo rm`           |
+| bacon                     | Background cargo check runner      |
+| Node.js 22                | Frontend runtime                   |
+| pnpm                      | Frontend package manager           |
+| bun                       | Fast JS runtime (scripts)          |
+| sccache                   | Rust build cache                   |
 | webkitgtk + wrapGAppsHook | Tauri desktop dependencies (Linux) |
 
 ---
@@ -156,15 +157,15 @@ For architecture decisions and rationale, start with
 
 ## Useful commands reference
 
-| Command | What it does |
-|---------|-------------|
-| `cargo build` | Compile backend |
-| `cargo test` | Run backend tests |
-| `cargo clippy` | Lint backend |
-| `cargo watch -x run` | Run backend with auto-reload |
-| `pnpm install` | Install frontend dependencies |
-| `pnpm build` | Build all frontend packages |
-| `pnpm lint` | Lint all frontend packages |
-| `pnpm --filter <pkg> dev` | Dev server for a specific package |
-| `nix build` | Build the full project via Nix |
-| `nix flake check` | Run all Nix checks (build + clippy + fmt + tests) |
+| Command                   | What it does                                      |
+| ------------------------- | ------------------------------------------------- |
+| `cargo build`             | Compile backend                                   |
+| `cargo test`              | Run backend tests                                 |
+| `cargo clippy`            | Lint backend                                      |
+| `cargo watch -x run`      | Run backend with auto-reload                      |
+| `pnpm install`            | Install frontend dependencies                     |
+| `pnpm build`              | Build all frontend packages                       |
+| `pnpm lint`               | Lint all frontend packages                        |
+| `pnpm --filter <pkg> dev` | Dev server for a specific package                 |
+| `nix build`               | Build the full project via Nix                    |
+| `nix flake check`         | Run all Nix checks (build + clippy + fmt + tests) |
