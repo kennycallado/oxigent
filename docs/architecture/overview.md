@@ -75,6 +75,8 @@
 | Frontend Architecture | `packages/`                    | [ADR-006](../adr/ADR-006-frontend-architecture.md)         |
 | API Contract          | `backend/crates/api`           | [ADR-007](../adr/ADR-007-frontend-backend-api-contract.md) |
 | Monorepo & Dev Env    | root config files              | [ADR-008](../adr/ADR-008-monorepo-dev-environment.md)      |
+| Error Handling        | `backend/crates/shared-kernel` | [ADR-009](../adr/ADR-009-error-handling.md)                |
+| API Versioning        | `backend/crates/api`           | [ADR-010](../adr/ADR-010-api-versioning-compatibility.md)  |
 
 ## Backend Architecture
 
@@ -150,11 +152,30 @@ Component requests data
   → Feature application service (app-core)
   → Port: QueryBus.dispatch(query)
      ┌── Web runtime: HTTP GET /v1/<resource> → backend/crates/api
-     │    OR SurrealDB SDK direct read (with row-level security)
+     │    OR SurrealDB SDK direct read (with row-level security, public tables only)
      └── Desktop runtime: Tauri command v1_<resource>
           OR SurrealDB embedded SDK direct read
           → QueryHandler → Projection/read model → SurrealQL SELECT
 ```
+
+## Error Flow
+
+```
+Rust domain / application layer raises AppError { code, message, details }
+  │
+  ├── REST path:
+  │     api crate → HTTP status (400/404/422/500) + JSON body
+  │       → platform-web adapter → typed AppError
+  │           → feature service → i18n key lookup → Lit component
+  │
+  └── Tauri path:
+        Tauri command Err(AppError) → invoke() rejection
+          → platform-desktop adapter → typed AppError
+              → feature service → i18n key lookup → Lit component
+```
+
+`AppError` is defined in `backend/crates/shared-kernel` and generated to TypeScript via
+Typeshare. See [ADR-009](../adr/ADR-009-error-handling.md).
 
 ## Desktop-Specific: Agent Execution
 
