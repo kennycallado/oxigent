@@ -8,96 +8,99 @@
 ┌─────────────────────────────────────────────────────────────────────┐
 │                        Client Layer                                 │
 │                                                                     │
-│   ┌───────────────────────────┐   ┌───────────────────────────┐    │
+│   ┌───────────────────────────┐   ┌────────────────────────────┐    │
 │   │       apps/web            │   │      apps/desktop          │    │
 │   │  Vite shell               │   │  Tauri 2 shell             │    │
 │   │  platform-web adapters    │   │  platform-desktop adapters │    │
 │   │  (HTTP/WS)                │   │  (Tauri commands/channels) │    │
-│   └─────────────┬─────────────┘   └─────────────┬─────────────┘    │
+│   └─────────────┬─────────────┘   └─────────────┬──────────────┘    │
 │                 │                               │                   │
-│   ┌─────────────▼───────────────────────────────▼─────────────┐    │
+│   ┌─────────────▼───────────────────────────────▼──────────────┐    │
 │   │                   Frontend Shared Core                     │    │
 │   │                                                            │    │
-│   │  packages/ui          Lit base components, iX wrappers    │    │
-│   │  packages/app-core    Ports, shared types, app services   │    │
-│   │  packages/features/*  tasks, boards, planning, agents...  │    │
+│   │  packages/ui          Lit base components, iX wrappers     │    │
+│   │  packages/app-core    Ports, shared types, app services    │    │
+│   │  packages/features/*  tasks, boards, planning, agents...   │    │
 │   └────────────────────────────────────────────────────────────┘    │
 └─────────────────────────────────────────────────────────────────────┘
-                 │ REST (web)                 │ Tauri commands (desktop)
+                 │ REST (web)                │ Tauri commands (desktop)
                  │                           │ (in-process, same handlers)
 ┌────────────────▼───────────────────────────▼─────────────────────────┐
-│                    Backend — Rust Modular Monolith                    │
-│                                                                       │
+│                    Backend — Rust Modular Monolith                   │
+│                                                                      │
 │  ┌─────────────────────────────────────────────────────────────────┐ │
 │  │  backend/crates/api        HTTP server (REST endpoints)         │ │
 │  └─────────────────────────────────────────────────────────────────┘ │
-│                                                                       │
-│  ┌───────────────┐ ┌──────────┐ ┌────────────────┐ ┌─────────────┐  │
-│  │work-management│ │ planning │ │agent-execution │ │identity-    │  │
-│  │               │ │          │ │                │ │access       │  │
-│  │ domain/       │ │ domain/  │ │ domain/        │ │             │  │
-│  │ application/  │ │ applic./ │ │ application/   │ │ domain/     │  │
-│  │ ports/        │ │ ports/   │ │ ports/         │ │ application/│  │
-│  │ adapters/     │ │ adapters/│ │ adapters/      │ │ ports/      │  │
-│  │ projections/  │ │ projec./ │ │ projections/   │ │ adapters/   │  │
-│  └───────────────┘ └──────────┘ └────────────────┘ └─────────────┘  │
-│                                                                       │
+│                                                                      │
+│  ┌───────────────┐ ┌──────────┐ ┌────────────────┐ ┌─────────────┐   │
+│  │work-management│ │ planning │ │agent-execution │ │identity-    │   │
+│  │               │ │          │ │                │ │access       │   │
+│  │ domain/       │ │ domain/  │ │ domain/        │ │             │   │
+│  │ application/  │ │ applic./ │ │ application/   │ │ domain/     │   │
+│  │ ports/        │ │ ports/   │ │ ports/         │ │ application/│   │
+│  │ adapters/     │ │ adapters/│ │ adapters/      │ │ ports/      │   │
+│  │ projections/  │ │ projec./ │ │ projections/   │ │ adapters/   │   │
+│  └───────────────┘ └──────────┘ └────────────────┘ └─────────────┘   │
+│                                                                      │
 │  ┌─────────────────────────────────────────────────────────────────┐ │
 │  │  backend/crates/integrations   git sync, Jira, webhooks         │ │
 │  └─────────────────────────────────────────────────────────────────┘ │
-│                                                                       │
+│                                                                      │
 │  ┌─────────────────────────────────────────────────────────────────┐ │
 │  │  backend/crates/shared-kernel   IDs, base event types, errors   │ │
 │  └─────────────────────────────────────────────────────────────────┘ │
-└───────────────────────────────────────────┬───────────────────────────┘
-                                            │
-                      ┌─────────────────────▼──────────────────────┐
-                      │               SurrealDB                    │
-                      │                                            │
-                      │  Embedded (Tauri desktop, in-process)      │
-                      │  Server mode (cloud, single-node → cluster)│
-                      │                                            │
-                      │  Multi-model: document, graph, relational, │
-                      │  vector (HNSW), full-text (BM25)           │
-                      └────────────────────────────────────────────┘
+└───────────────────────┬──────────────────────────────────────────────┘
+                        │
+  ┌─────────────────────▼──────────────────────┐
+  │               SurrealDB                    │
+  │                                            │
+  │  Embedded (Tauri desktop, in-process)      │
+  │  Server mode (cloud, single-node → cluster)│
+  │                                            │
+  │  Multi-model: document, graph, relational, │
+  │  vector (HNSW), full-text (BM25)           │
+  └────────────────────────────────────────────┘
 ```
 
 ## Module Map
 
-| Module | Path | ADR |
-|---|---|---|
-| General Architecture | — | [ADR-001](../adr/ADR-001-general-architecture.md) |
-| Bounded Contexts | `backend/crates/` | [ADR-002](../adr/ADR-002-bounded-contexts.md) |
-| Shared Kernel | `backend/crates/shared-kernel` | [ADR-002](../adr/ADR-002-bounded-contexts.md) |
-| Technology Stack | — | [ADR-003](../adr/ADR-003-technology-stack.md) |
-| Data Technology | SurrealDB | [ADR-004](../adr/ADR-004-data-technology.md) |
-| Offline & Sync | Outbox pattern | [ADR-005](../adr/ADR-005-offline-sync-strategy.md) |
-| Frontend Architecture | `packages/` | [ADR-006](../adr/ADR-006-frontend-architecture.md) |
-| API Contract | `backend/crates/api` | [ADR-007](../adr/ADR-007-frontend-backend-api-contract.md) |
-| Monorepo & Dev Env | root config files | [ADR-008](../adr/ADR-008-monorepo-dev-environment.md) |
+| Module                | Path                           | ADR                                                        |
+| --------------------- | ------------------------------ | ---------------------------------------------------------- |
+| General Architecture  | —                              | [ADR-001](../adr/ADR-001-general-architecture.md)          |
+| Bounded Contexts      | `backend/crates/`              | [ADR-002](../adr/ADR-002-bounded-contexts.md)              |
+| Shared Kernel         | `backend/crates/shared-kernel` | [ADR-002](../adr/ADR-002-bounded-contexts.md)              |
+| Technology Stack      | —                              | [ADR-003](../adr/ADR-003-technology-stack.md)              |
+| Data Technology       | SurrealDB                      | [ADR-004](../adr/ADR-004-data-technology.md)               |
+| Offline & Sync        | Outbox pattern                 | [ADR-005](../adr/ADR-005-offline-sync-strategy.md)         |
+| Frontend Architecture | `packages/`                    | [ADR-006](../adr/ADR-006-frontend-architecture.md)         |
+| API Contract          | `backend/crates/api`           | [ADR-007](../adr/ADR-007-frontend-backend-api-contract.md) |
+| Monorepo & Dev Env    | root config files              | [ADR-008](../adr/ADR-008-monorepo-dev-environment.md)      |
 
 ## Backend Architecture
 
-Each bounded context crate follows the same internal layering (target layout — the current scaffold may have flat files; this is the intended structure):
+Each bounded context crate is subdivided into modules. Every module — including the only module in a small crate — replicates the full set of layers. The crate never exposes flat `domain/`, `application/` etc. directories at the `src/` root level.
 
 ```
 backend/crates/<context>/
   src/
-    domain/
-      mod.rs              # Aggregates, entities, value objects
-      events.rs           # Domain events (shared-kernel base types)
-    application/
-      commands/           # Command structs + CommandHandler impls
-      queries/            # Query structs + QueryHandler impls
-    ports/
-      mod.rs              # Repository traits, bus traits, external service traits
-    adapters/
-      surreal.rs          # SurrealDB repository implementations
-      http.rs             # HTTP adapter (if context exposes its own endpoints)
-    projections/
-      mod.rs              # Read models, materialized views
+    <module>/             # One directory per module (aggregate, subdomain, or capability)
+      domain/
+        mod.rs            # Aggregates, entities, value objects
+        events.rs         # Domain events (shared-kernel base types)
+      application/
+        commands/         # Command structs + CommandHandler impls
+        queries/          # Query structs + QueryHandler impls
+      ports/
+        mod.rs            # Repository traits, bus traits, external service traits
+      adapters/
+        surreal.rs        # SurrealDB repository implementations
+        http.rs           # HTTP adapter (if context exposes its own endpoints)
+      projections/
+        mod.rs            # Read models, materialized views
     lib.rs
 ```
+
+The module name is chosen by the team based on what groups naturally within the context (aggregate, subdomain, or capability) — there is no prescribed grouping rule. See [ADR-002](../adr/ADR-002-bounded-contexts.md) for the bounded context definitions and the internal module structure decision.
 
 Cross-context communication: direct function calls via shared-kernel types for synchronous queries; in-process event bus (`tokio::sync::broadcast`) for fire-and-forget domain event notifications. No external broker. See [ADR-002](../adr/ADR-002-bounded-contexts.md).
 
@@ -123,7 +126,7 @@ apps/desktop/src/
   main.ts                 # Composition root: instantiate platform-desktop adapters, inject into features
 ```
 
-Dependency rule: features → app-core ports only. Never feature → platform-*. See [ADR-006](../adr/ADR-006-frontend-architecture.md).
+Dependency rule: features → app-core ports only. Never feature → platform-\*. See [ADR-006](../adr/ADR-006-frontend-architecture.md).
 
 ## Data Flow: Write (Mutation)
 

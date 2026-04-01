@@ -43,6 +43,8 @@ Shared vocabulary lives in `backend/crates/shared-kernel`: common value objects 
 
 **Agent Execution isolation rule:** A task may reference an agent run (by ID), but `agent-execution` concepts (prompt, tool invocation, output chunk) must never appear in `work-management` domain types. The integration is a cross-context relationship expressed through shared-kernel IDs only.
 
+**Internal module structure:** Each bounded context crate is subdivided into modules. Every module — even if only one exists in the crate — contains its own full set of layers: `domain/`, `application/`, `ports/`, `adapters/`, `projections/`. The module name is chosen by the team based on what groups naturally within the context (aggregate, subdomain, or capability). There is no prescribed rule for grouping. This vertical slice convention ensures that the codebase grows by adding modules, not by growing flat layer directories. The crate never exposes flat layer directories at the `src/` root level.
+
 ## Consequences
 
 **Easier:**
@@ -53,5 +55,6 @@ Shared vocabulary lives in `backend/crates/shared-kernel`: common value objects 
 **Harder:**
 - Cross-context queries require explicit projections or join services
 - Team must respect context boundaries — linter/module visibility rules should enforce this
+- All new domain concepts require creating a module subdirectory even if only one layer is initially needed; this prevents shortcuts that lead back to flat structure
 
 See [ADR-001](./ADR-001-general-architecture.md) for the overall modular monolith architecture, and [ADR-004](./ADR-004-data-technology.md) for the shared data technology used by all contexts.
