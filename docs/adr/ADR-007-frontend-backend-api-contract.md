@@ -26,8 +26,15 @@ REST/Tauri commands for all mutations and auth. SurrealDB SDK for reads/subscrip
 - Web shell calls over HTTP. Desktop shell short-circuits HTTP via Tauri commands calling the same Rust handlers in-process.
 
 **SurrealDB SDK** (direct client connection):
-- Permitted for: reads and live query subscriptions on the local embedded instance (desktop), or direct reads with DB-enforced row-level security (web).
-- Forbidden for: any write operation from the frontend. Frontend must never bypass the REST/Tauri layer for writes.
+
+- **Desktop (embedded):** SDK direct access fully permitted for both reads and live query subscriptions. The database is local to the user's machine; no network boundary exists.
+
+- **Web (server mode):** SDK direct access permitted **only for explicitly declared public tables**. Rules:
+  1. A table is "public" only if it is listed in a `-- @public-read` comment block at the top of the corresponding SurrealQL schema file (e.g. `backend/schema/<table>.surql`).
+  2. SurrealDB session auth must be fully configured before any SDK connection is opened from the web client. The web adapter (in `packages/platform-web`) is responsible for establishing and refreshing the session token.
+  3. All writes and all business-logic reads (joins, projections, aggregations that enforce domain invariants) must go through the REST API even for public tables.
+
+- **Forbidden for:** any write operation from the frontend. Frontend must never bypass the REST/Tauri layer for writes, regardless of table visibility.
 
 **Desktop short-circuit:** The desktop shell does not make HTTP calls to itself. Tauri command handlers call the same Rust application service functions that the REST handlers call. Same business logic, two transports.
 
@@ -43,6 +50,10 @@ REST/Tauri commands for all mutations and auth. SurrealDB SDK for reads/subscrip
 
 See [ADR-006](./ADR-006-frontend-architecture.md) for the frontend package structure that consumes this contract.
 
+---
+
+*Amendment 2026-04-01: Tightened web SurrealDB SDK rules (explicit public-table declaration required; session auth precondition; `-- @public-read` annotation convention). Added CI enforcement for Typeshare codegen freshness. See git log for full diff.*
+
 ## Consequences
 
 **Easier:**
@@ -54,3 +65,4 @@ See [ADR-006](./ADR-006-frontend-architecture.md) for the frontend package struc
 - Every new operation needs both a REST endpoint and a Tauri command (same handler, two registrations)
 - Typeshare requires running the codegen step when Rust API types change; CI enforces freshness via `git diff --exit-code` on `packages/app-core/src/generated/`
 - SurrealDB schema types and Typeshare-generated types must stay in sync manually
+- Web SDK direct access requires each public-read table to be explicitly declared with a `-- @public-read` annotation in its SurrealQL schema file; undeclared tables stay private
