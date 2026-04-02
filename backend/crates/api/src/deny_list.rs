@@ -13,11 +13,17 @@ impl DenyList {
         Self::default()
     }
 
-    /// Revoke a token by its JTI. `exp` is the token's expiry unix timestamp.
-    pub fn revoke(&self, jti: &str, exp: u64) {
+    /// Atomically revoke a token if it has not already been revoked.
+    /// Returns `true` if the token was newly revoked, `false` if it was already revoked.
+    /// `exp` is the token's expiry unix timestamp.
+    pub fn revoke_if_not_revoked(&self, jti: &str, exp: u64) -> bool {
         let mut map = self.inner.lock().unwrap();
+        if map.contains_key(jti) {
+            return false;
+        }
         self.prune(&mut map);
         map.insert(jti.to_string(), exp);
+        true
     }
 
     /// Returns true if this JTI has been revoked.
@@ -49,10 +55,17 @@ mod tests {
     }
 
     #[test]
-    fn revoked_jti_is_denied() {
+    fn revoke_if_not_revoked_returns_true_on_first_call() {
         let dl = DenyList::new();
-        dl.revoke("jti-abc", far_future());
+        assert!(dl.revoke_if_not_revoked("jti-abc", far_future()));
         assert!(dl.is_revoked("jti-abc"));
+    }
+
+    #[test]
+    fn revoke_if_not_revoked_returns_false_on_duplicate() {
+        let dl = DenyList::new();
+        assert!(dl.revoke_if_not_revoked("jti-abc", far_future()));
+        assert!(!dl.revoke_if_not_revoked("jti-abc", far_future()));
     }
 
     #[test]
@@ -67,7 +80,7 @@ mod tests {
         // Insert an already-expired entry directly
         dl.inner.lock().unwrap().insert("old-jti".to_string(), 1);
         // Insert a new entry — prune runs
-        dl.revoke("new-jti", far_future());
+        dl.revoke_if_not_revoked("new-jti", far_future());
         assert!(!dl.is_revoked("old-jti"), "expired entry should be pruned");
         assert!(dl.is_revoked("new-jti"));
     }

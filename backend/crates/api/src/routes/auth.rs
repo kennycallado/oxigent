@@ -6,7 +6,7 @@ use shared_kernel::prelude::AppError;
 
 use identity_access::user::application::AuthenticateUserCommand;
 
-use crate::error::ApiError;
+use crate::error::{ApiError, AppJson};
 use crate::state::AppState;
 
 #[derive(Debug, Deserialize)]
@@ -22,7 +22,7 @@ pub struct LoginResponse {
 
 pub async fn login(
     State(state): State<Arc<AppState>>,
-    Json(body): Json<LoginRequest>,
+    AppJson(body): AppJson<LoginRequest>,
 ) -> Result<(StatusCode, Json<LoginResponse>), ApiError> {
     let email = body.email.ok_or_else(|| {
         AppError::new("E_VALIDATION", "email is required").with_detail("email", "required")
@@ -53,11 +53,10 @@ pub async fn logout(
 
     let claims = state.jwt.validate(token)?;
 
-    if state.deny_list.is_revoked(&claims.jti) {
+    if !state.deny_list.revoke_if_not_revoked(&claims.jti, claims.exp) {
         return Err(AppError::new("E_UNAUTHORIZED", "token already revoked").into());
     }
 
-    state.deny_list.revoke(&claims.jti, claims.exp);
     Ok(StatusCode::NO_CONTENT)
 }
 
@@ -112,6 +111,36 @@ mod tests {
     async fn body_json(body: Body) -> Value {
         let bytes = body.collect().await.unwrap().to_bytes();
         serde_json::from_slice(&bytes).unwrap()
+    }
+
+    #[tokio::test]
+    async fn login_malformed_json_returns_400_with_api_error_contract() {
+        let app = build_router(test_state());
+        let req = Request::builder()
+            .method(Method::POST)
+            .uri("/v1/auth/login")
+            .header(header::CONTENT_TYPE, "application/json")
+            .body(Body::from("not valid json"))
+            .unwrap();
+        let res = app.oneshot(req).await.unwrap();
+        assert_eq!(res.status(), StatusCode::BAD_REQUEST);
+        let body = body_json(res.into_body()).await;
+        assert_eq!(body["code"], "E_VALIDATION");
+    }
+
+    #[tokio::test]
+    async fn login_wrong_content_type_returns_400_with_api_error_contract() {
+        let app = build_router(test_state());
+        let req = Request::builder()
+            .method(Method::POST)
+            .uri("/v1/auth/login")
+            .header(header::CONTENT_TYPE, "text/plain")
+            .body(Body::from("email=alice"))
+            .unwrap();
+        let res = app.oneshot(req).await.unwrap();
+        assert_eq!(res.status(), StatusCode::BAD_REQUEST);
+        let body = body_json(res.into_body()).await;
+        assert_eq!(body["code"], "E_VALIDATION");
     }
 
     #[tokio::test]

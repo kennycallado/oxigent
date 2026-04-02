@@ -1,9 +1,40 @@
 use axum::{
+    extract::{FromRequest, Request, rejection::JsonRejection},
     http::StatusCode,
     response::{IntoResponse, Response},
     Json,
 };
 use shared_kernel::prelude::AppError;
+
+/// Newtype wrapper over `axum::Json` that maps `JsonRejection` to `ApiError`
+/// so malformed or missing JSON bodies return the standard AppError contract.
+pub struct AppJson<T>(pub T);
+
+impl<T, S> FromRequest<S> for AppJson<T>
+where
+    T: serde::de::DeserializeOwned,
+    S: Send + Sync,
+{
+    type Rejection = ApiError;
+
+    async fn from_request(req: Request, state: &S) -> Result<Self, Self::Rejection> {
+        match Json::<T>::from_request(req, state).await {
+            Ok(Json(value)) => Ok(AppJson(value)),
+            Err(rejection) => {
+                let err = match rejection {
+                    JsonRejection::JsonDataError(_) | JsonRejection::JsonSyntaxError(_) => {
+                        AppError::new("E_VALIDATION", "invalid JSON body")
+                    }
+                    JsonRejection::MissingJsonContentType(_) => {
+                        AppError::new("E_VALIDATION", "Content-Type must be application/json")
+                    }
+                    _ => AppError::new("E_VALIDATION", "failed to parse request body"),
+                };
+                Err(ApiError(err))
+            }
+        }
+    }
+}
 
 #[derive(Debug, Clone)]
 pub struct ApiError(pub AppError);
