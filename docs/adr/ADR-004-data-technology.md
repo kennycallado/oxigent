@@ -1,9 +1,11 @@
 # ADR-004: Data Technology
 
 ## Status
+
 Accepted
 
 ## Context
+
 The application requires a database that works both embedded (in-process, for the Tauri desktop app) and as a standalone server (for cloud/web deployment). It also needs to support relational queries, graph relationships (task dependencies, agent memory), vector search (semantic agent memory), and full-text search — without adding separate infrastructure components for each capability.
 
 ## Options Considered
@@ -34,12 +36,14 @@ Single system for both embedded (desktop) and server (cloud) modes. Multi-model:
 ## Consequences
 
 **Easier:**
+
 - Single data model for embedded and server modes
 - No separate vector DB or search engine to operate
 - SurrealQL covers graph traversal, full-text, and vector similarity in one query
 - Desktop development uses the same database driver as server
 
 **Harder:**
+
 - SurrealDB is less mature than PostgreSQL — fewer operational tools, smaller community
 - Live queries limited to single-node: horizontal scaling requires the outbox pattern (see [ADR-005](./ADR-005-offline-sync-strategy.md))
 - Multi-node SurrealDB deployments are not yet production-proven for all workloads

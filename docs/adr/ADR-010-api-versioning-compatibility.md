@@ -1,9 +1,11 @@
 # ADR-010: API Versioning and Desktop Compatibility
 
 ## Status
+
 Accepted
 
 ## Context
+
 The desktop app ships as a native binary via Tauri. Users may not update immediately. The
 backend API evolves. Without a formal compatibility strategy:
 
@@ -46,16 +48,16 @@ window defined below.
 
 ### Breaking vs non-breaking changes
 
-| Change type                                          | Classification |
-|------------------------------------------------------|----------------|
-| Add optional response field                          | Non-breaking   |
-| Add new endpoint / Tauri command                     | Non-breaking   |
-| Remove response field                                | **Breaking**   |
-| Rename response field                                | **Breaking**   |
-| Change field type (e.g. `string` → `number`)         | **Breaking**   |
-| Remove endpoint / Tauri command                      | **Breaking**   |
-| Change error code constant (see ADR-009)             | **Breaking**   |
-| Add required request field                           | **Breaking**   |
+| Change type                                  | Classification |
+| -------------------------------------------- | -------------- |
+| Add optional response field                  | Non-breaking   |
+| Add new endpoint / Tauri command             | Non-breaking   |
+| Remove response field                        | **Breaking**   |
+| Rename response field                        | **Breaking**   |
+| Change field type (e.g. `string` → `number`) | **Breaking**   |
+| Remove endpoint / Tauri command              | **Breaking**   |
+| Change error code constant (see ADR-009)     | **Breaking**   |
+| Add required request field                   | **Breaking**   |
 
 Non-breaking changes may be deployed without a version bump.
 Breaking changes require a new version (`/vN+1/`) and must not be deployed to `/vN/`.
@@ -77,9 +79,9 @@ Response (success):
 
 ```json
 {
-  "api_version":        "1",
+  "api_version": "1",
   "min_client_version": "1.2.0",
-  "latest_version":     "1.5.0"
+  "latest_version": "1.5.0"
 }
 ```
 
@@ -92,11 +94,11 @@ Response when backend no longer supports the calling client:
 
 ```json
 {
-  "api_version":        "2",
+  "api_version": "2",
   "min_client_version": "2.0.0",
-  "latest_version":     "2.1.0",
-  "upgrade_required":   true,
-  "upgrade_message":    "This version is no longer supported. Please update the app."
+  "latest_version": "2.1.0",
+  "upgrade_required": true,
+  "upgrade_message": "This version is no longer supported. Please update the app."
 }
 ```
 
@@ -149,11 +151,13 @@ Desktop app startup
 ## Consequences
 
 **Easier:**
+
 - Backend can make breaking changes without silently breaking shipped desktop clients
 - Deprecation window gives users a clear, time-bounded upgrade path
 - Startup handshake prevents users from running incompatible combinations silently
 
 **Harder:**
+
 - Every breaking change requires shipping both the old and new API version simultaneously
   during the deprecation window (doubles maintenance surface temporarily)
 - Backend must track `min_client_version` and update it deliberately when dropping old compat

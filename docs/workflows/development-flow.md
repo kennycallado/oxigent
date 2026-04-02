@@ -64,6 +64,7 @@ gh pr create --fill
 ```
 
 PR requirements:
+
 - Title follows the same format as commit messages (see [conventions.md](./conventions.md))
 - Body contains `Closes #<issue-number>` so the issue closes automatically on merge
 - CI must pass before requesting review
@@ -85,6 +86,7 @@ The issue closes automatically when the PR is merged (via `Closes #N` in the PR 
 After opening a PR, the agent **must**:
 
 1. **Notify the human** with a summary:
+
    ```
    PR #N listo para review: <URL>
    Issue #<N>: <title>
@@ -92,7 +94,8 @@ After opening a PR, the agent **must**:
    Resumen: <1-2 líneas de qué se hizo>
    Checks: <tests, clippy status>
    ```
-2. **Write the postmortem** in `docs/postmortems/YYYY-MM-DD-<topic>.md` (see AGENTS.md)
+
+2. **Write the postmortem** in `docs/superpowers/postmortems/YYYY-MM-DD-<topic>.md` (see AGENTS.md)
 3. **Stop and wait** for the human to review
 
 The agent must **NOT** merge or take another issue until the human responds.
@@ -101,9 +104,9 @@ The agent must **NOT** merge or take another issue until the human responds.
 
 The human reviews the PR (or requests `@agent_glm` review). Two options:
 
-| Option | Human says | Agent executes |
-|--------|-----------|----------------|
-| **A: Merge manual** | "listo", "merged" | Pull main + cleanup worktree |
+| Option                | Human says           | Agent executes                                           |
+| --------------------- | -------------------- | -------------------------------------------------------- |
+| **A: Merge manual**   | "listo", "merged"    | Pull main + cleanup worktree                             |
 | **B: Delegate merge** | "merge #N y cleanup" | Postmortem → squash merge → pull main → cleanup worktree |
 
 ### 5c. Agent: Post-merge cleanup
@@ -129,22 +132,23 @@ If using the `finishing-a-development-branch` skill, follow it instead — it ha
 
 ### Status
 
-| State | When to set it |
-|-------|----------------|
-| Todo | Issue created, not started |
-| In Progress | Branch created, work started |
-| In Review | PR opened |
-| Done | PR merged (automatic via `Closes #N`) |
+| State       | When to set it                        |
+| ----------- | ------------------------------------- |
+| Todo        | Issue created, not started            |
+| In Progress | Branch created, work started          |
+| In Review   | PR opened                             |
+| Done        | PR merged (automatic via `Closes #N`) |
 
 ### Additional fields
 
-| Field | Values | When to set |
-|-------|--------|-------------|
-| `Priority` | `Critical` / `High` / `Medium` / `None` | At triage or when picking the issue |
-| `Blocked` | `Yes` / `No` | When a dependency prevents progress; note the blocker in the issue body |
-| `Agent` | e.g. `@agent_gpt` | When a subagent is assigned to the issue (set before starting work) |
+| Field      | Values                                  | When to set                                                             |
+| ---------- | --------------------------------------- | ----------------------------------------------------------------------- |
+| `Priority` | `Critical` / `High` / `Medium` / `None` | At triage or when picking the issue                                     |
+| `Blocked`  | `Yes` / `No`                            | When a dependency prevents progress; note the blocker in the issue body |
+| `Agent`    | e.g. `@agent_gpt`                       | When a subagent is assigned to the issue (set before starting work)     |
 
 Rules:
+
 - An issue with `Blocked: Yes` should not be in `In Progress` unless the blocker is being resolved
 - `Agent` is cleared when the work is merged (issue closes)
 - `Priority: Critical` means the issue must be resolved before any other work in the milestone
@@ -155,11 +159,11 @@ Rules:
 
 Issues are grouped into four milestones:
 
-| Milestone | Target | Scope |
-|-----------|--------|-------|
-| Fase 1 — Esqueleto funcional | 2026-05-30 | Auth + tasks list on web and desktop |
+| Milestone                           | Target     | Scope                                |
+| ----------------------------------- | ---------- | ------------------------------------ |
+| Fase 1 — Esqueleto funcional        | 2026-05-30 | Auth + tasks list on web and desktop |
 | Fase 2 — Gestión de tareas completa | 2026-08-15 | Full task lifecycle, boards, offline |
-| Fase 3 — Integración de agentes | 2026-10-31 | Agent execution from desktop |
-| Fase 4 — Integraciones externas | Open | Git sync, Jira, webhooks |
+| Fase 3 — Integración de agentes     | 2026-10-31 | Agent execution from desktop         |
+| Fase 4 — Integraciones externas     | Open       | Git sync, Jira, webhooks             |
 
 Only work on the current milestone unless there is a specific reason to look ahead.

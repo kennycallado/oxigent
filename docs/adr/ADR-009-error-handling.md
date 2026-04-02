@@ -1,9 +1,11 @@
 # ADR-009: Error Handling Strategy
 
 ## Status
+
 Accepted
 
 ## Context
+
 The system spans Rust backend, TypeScript frontend (Lit components), two transports (REST
 and Tauri commands), and two runtimes (web, desktop). Errors must:
 
@@ -42,11 +44,9 @@ All error responses (REST and Tauri command errors) use this JSON shape:
 
 ```json
 {
-  "code":    "E_TASK_NOT_FOUND",
+  "code": "E_TASK_NOT_FOUND",
   "message": "Task with id 'abc-123' does not exist.",
-  "details": [
-    { "field": "task_id", "issue": "not_found" }
-  ]
+  "details": [{ "field": "task_id", "issue": "not_found" }]
 }
 ```
 
@@ -99,7 +99,7 @@ and maps `code` to an i18n key for display.
 ### HTTP status mapping
 
 | Situation                                     | HTTP Status               |
-|-----------------------------------------------|---------------------------|
+| --------------------------------------------- | ------------------------- |
 | Input fails schema validation (missing field) | 400 Bad Request           |
 | Domain validation fails (business rule)       | 422 Unprocessable Entity  |
 | Resource not found                            | 404 Not Found             |
@@ -139,12 +139,14 @@ Rust domain / application layer raises AppError
 ## Consequences
 
 **Easier:**
+
 - Frontend can branch on `code` string without string-matching `message`
 - i18n: `code` maps 1:1 to an i18n key; no translation logic in backend
 - One `AppError` type works for both REST and Tauri transports
 - 500 errors never leak internals to web clients
 
 **Harder:**
+
 - Error codes must be treated as part of the API contract — renaming a code is a breaking
   change subject to the deprecation policy in [ADR-010](./ADR-010-api-versioning-compatibility.md)
 - Every new domain error requires adding a code constant to `shared-kernel` and a

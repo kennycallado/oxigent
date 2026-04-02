@@ -16,16 +16,16 @@ Implemented `POST /v1/auth/login` and `POST /v1/auth/logout` endpoints in the `a
 
 ### Tasks completed (8 total)
 
-| # | Task | Notes |
-|---|------|-------|
-| 1 | Workspace deps | axum 0.8, jsonwebtoken 9, argon2 0.5, uuid v4; fixed duplicate `tower` in api deps |
-| 2 | `Argon2PasswordHasher` | Replaced `PlainPasswordHasher`; UUID-based salt; issue #25 opened for observability follow-up |
-| 3 | `AuthenticateUser` service | Application service in `identity-access`; TODO annotation for input validation parity |
-| 4 | `AppConfig`, `ApiError`, `JwtService` | Orphan-safe `ApiError` newtype; explicit `Role` match for PascalCase JWT claims; `SystemTime` error propagated |
-| 5 | `DenyList` + `AppState` | `Arc<Mutex<HashMap>>` deny-list with prune-on-insert; `AppState::new` wiring |
-| 6 | `require_auth` middleware | Bearer extraction → JWT validate → deny-list check → inject `Claims` extension |
-| 7 | `login` + `logout` handlers | 5 integration tests; all 11 api tests pass |
-| 8 | Final checks + push | clippy clean; 29 tests across workspace pass; spurious postmortem deleted; branch pushed |
+| #   | Task                                  | Notes                                                                                                          |
+| --- | ------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| 1   | Workspace deps                        | axum 0.8, jsonwebtoken 9, argon2 0.5, uuid v4; fixed duplicate `tower` in api deps                             |
+| 2   | `Argon2PasswordHasher`                | Replaced `PlainPasswordHasher`; UUID-based salt; issue #25 opened for observability follow-up                  |
+| 3   | `AuthenticateUser` service            | Application service in `identity-access`; TODO annotation for input validation parity                          |
+| 4   | `AppConfig`, `ApiError`, `JwtService` | Orphan-safe `ApiError` newtype; explicit `Role` match for PascalCase JWT claims; `SystemTime` error propagated |
+| 5   | `DenyList` + `AppState`               | `Arc<Mutex<HashMap>>` deny-list with prune-on-insert; `AppState::new` wiring                                   |
+| 6   | `require_auth` middleware             | Bearer extraction → JWT validate → deny-list check → inject `Claims` extension                                 |
+| 7   | `login` + `logout` handlers           | 5 integration tests; all 11 api tests pass                                                                     |
+| 8   | Final checks + push                   | clippy clean; 29 tests across workspace pass; spurious postmortem deleted; branch pushed                       |
 
 ---
 
@@ -48,7 +48,7 @@ Implemented `POST /v1/auth/login` and `POST /v1/auth/logout` endpoints in the `a
 
 ### 2. Spurious postmortem created mid-implementation
 
-`@agent_gpt` created `docs/postmortems/2026-04-02-task-7-auth-routes.md` during Task 7, mistaking the task for completion of the whole issue. It was deleted in Task 8.
+`@agent_gpt` created `docs/superpowers/postmortems/2026-04-02-task-7-auth-routes.md` during Task 7, mistaking the task for completion of the whole issue. It was deleted in Task 8.
 
 **Lesson:** Implementer prompts should explicitly state "do NOT write a postmortem — that is the orchestrator's responsibility after the PR is merged."
 

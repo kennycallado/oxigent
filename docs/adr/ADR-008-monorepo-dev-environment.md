@@ -1,9 +1,11 @@
 # ADR-008: Monorepo & Dev Environment
 
 ## Status
+
 Accepted
 
 ## Context
+
 The project spans Rust (backend + Tauri), TypeScript (frontend packages, apps), and infrastructure (deploy). A single repository reduces cross-cutting changes from multi-repo coordination overhead. The dev environment must be reproducible across macOS and Linux.
 
 ## Options Considered
@@ -49,12 +51,14 @@ Cargo workspace for Rust crates, pnpm workspaces for TypeScript packages/apps, N
 ## Consequences
 
 **Easier:**
+
 - `cargo build --workspace` and `pnpm -r build` build everything from root
 - Typeshare codegen runs once and updates all TypeScript consumers
 - Nix flake ensures exact same toolchain versions on every machine and in CI
 - Worktrees allow reviewing architecture docs in one terminal while writing feature code in another
 
 **Harder:**
+
 - Nix has a learning curve for contributors unfamiliar with it
 - pnpm workspace + Cargo workspace means two separate lock files to maintain
 - Initial Nix flake setup is non-trivial (Tauri system deps vary by OS)

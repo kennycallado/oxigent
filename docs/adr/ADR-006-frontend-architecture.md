@@ -1,9 +1,11 @@
 # ADR-006: Frontend Architecture
 
 ## Status
+
 Accepted
 
 ## Context
+
 The frontend must serve two runtimes (browser and Tauri webview) without duplicating feature code. Platform-specific capabilities (filesystem, secure secrets, agent execution, local database) must be available on desktop but absent on web, without polluting shared feature code with `if (isTauri)` guards.
 
 ## Options Considered
@@ -45,26 +47,28 @@ apps/
 
 **Desktop-specific adapters** (defined as ports in `app-core`, implemented in `platform-desktop`):
 
-| Port | Desktop Adapter | Capability |
-|---|---|---|
-| `AgentRuntimeGateway` | `TauriAgentExecutor` | Runs CLI sidecars (Claude Code, Codex) via Tauri `externalBin` |
-| `LocalWorkspaceAdapter` | `TauriFilesystemAdapter` | Reads/writes local filesystem, Git repo artefacts |
-| `LocalStorageAdapter` | `TauriStoreAdapter` | Persistent local cache, offline command queue |
-| `SecureSecretsAdapter` | `TauriKeyringAdapter` | API keys, credentials via OS keychain |
+| Port                    | Desktop Adapter          | Capability                                                     |
+| ----------------------- | ------------------------ | -------------------------------------------------------------- |
+| `AgentRuntimeGateway`   | `TauriAgentExecutor`     | Runs CLI sidecars (Claude Code, Codex) via Tauri `externalBin` |
+| `LocalWorkspaceAdapter` | `TauriFilesystemAdapter` | Reads/writes local filesystem, Git repo artefacts              |
+| `LocalStorageAdapter`   | `TauriStoreAdapter`      | Persistent local cache, offline command queue                  |
+| `SecureSecretsAdapter`  | `TauriKeyringAdapter`    | API keys, credentials via OS keychain                          |
 
 **Dependency injection:** Shell applications (`apps/web`, `apps/desktop`) are the composition root. They instantiate adapter implementations and inject them into feature modules at startup. `app-core` defines ports only — it has no knowledge of any adapter implementation.
 
-**app-core does not re-export platform adapters.** The dependency direction is strictly: features → app-core ports ← platform-* adapters. Shells compose and wire.
+**app-core does not re-export platform adapters.** The dependency direction is strictly: features → app-core ports ← platform-\* adapters. Shells compose and wire.
 
 See [ADR-007](./ADR-007-frontend-backend-api-contract.md) for the API contract that governs how these adapters communicate with the backend.
 
 ## Consequences
 
 **Easier:**
+
 - Features can be developed and tested in isolation with mock adapters
-- Adding a new platform (e.g., mobile) requires only a new platform-* package and a new shell
+- Adding a new platform (e.g., mobile) requires only a new platform-\* package and a new shell
 - Desktop adapters can change implementation (e.g., swap keychain library) without touching feature code
 
 **Harder:**
+
 - Every new platform capability requires defining a port first
 - Composition root (shell startup) grows as features are added — needs discipline to stay clean

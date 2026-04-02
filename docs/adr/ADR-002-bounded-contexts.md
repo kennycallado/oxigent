@@ -1,9 +1,11 @@
 # ADR-002: Bounded Contexts
 
 ## Status
+
 Accepted
 
 ## Context
+
 A task-management platform with agent integration spans several distinct areas of responsibility. Without explicit boundaries, domain concepts leak across contexts, making the codebase harder to maintain and reason about. We need to define which contexts exist, what they own, and how they communicate.
 
 ## Options Considered
@@ -21,13 +23,13 @@ Adds operational complexity (service discovery, network partitions, distributed 
 
 Five bounded contexts, each as a Rust crate under `backend/crates/`:
 
-| Context | Crate | Responsibilities |
-|---|---|---|
-| Work Management | `work-management` | Task, subtask, workflow state, labels, priority, assignee, SLA |
-| Planning | `planning` | Board, sprint/cycle, backlog ordering, capacity |
-| Agent Execution | `agent-execution` | Run, session, tool invocation, prompt, output chunk, artifact, approval |
-| Identity & Access | `identity-access` | User, role, permission, tenancy |
-| Integrations | `integrations` | Git sync, Jira import/export, webhooks, notifications |
+| Context           | Crate             | Responsibilities                                                        |
+| ----------------- | ----------------- | ----------------------------------------------------------------------- |
+| Work Management   | `work-management` | Task, subtask, workflow state, labels, priority, assignee, SLA          |
+| Planning          | `planning`        | Board, sprint/cycle, backlog ordering, capacity                         |
+| Agent Execution   | `agent-execution` | Run, session, tool invocation, prompt, output chunk, artifact, approval |
+| Identity & Access | `identity-access` | User, role, permission, tenancy                                         |
+| Integrations      | `integrations`    | Git sync, Jira import/export, webhooks, notifications                   |
 
 Shared vocabulary lives in `backend/crates/shared-kernel`: common value objects (UserId, TaskId, Timestamp, etc.), domain event base types, error types.
 
@@ -48,11 +50,13 @@ Shared vocabulary lives in `backend/crates/shared-kernel`: common value objects 
 ## Consequences
 
 **Easier:**
+
 - Each context can be understood and tested independently
 - No context can accidentally corrupt another's invariants
 - Future extraction to separate service is possible without rewriting domain logic
 
 **Harder:**
+
 - Cross-context queries require explicit projections or join services
 - Team must respect context boundaries — linter/module visibility rules should enforce this
 - All new domain concepts require creating a module subdirectory even if only one layer is initially needed; this prevents shortcuts that lead back to flat structure

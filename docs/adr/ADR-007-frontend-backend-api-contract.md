@@ -1,9 +1,11 @@
 # ADR-007: Frontend–Backend API Contract
 
 ## Status
+
 Accepted
 
 ## Context
+
 The frontend has two runtimes (web, desktop) and two access paths to the backend (HTTP REST and Tauri commands). SurrealDB can also be accessed directly from clients via its SDK. We need clear rules about which path is used for which operations, and how types are shared.
 
 ## Options Considered
@@ -22,6 +24,7 @@ REST/Tauri commands for all mutations and auth. SurrealDB SDK for reads/subscrip
 **Two access paths with a strict boundary:**
 
 **REST API** (`backend/crates/api` crate, web transport):
+
 - Mandatory for: all mutations (create, update, delete), operations involving business rules or domain invariants, auth and session orchestration, multi-step workflows.
 - Web shell calls over HTTP. Desktop shell short-circuits HTTP via Tauri commands calling the same Rust handlers in-process.
 
@@ -30,6 +33,7 @@ REST/Tauri commands for all mutations and auth. SurrealDB SDK for reads/subscrip
 - **Desktop (embedded):** SDK direct access fully permitted for both reads and live query subscriptions. The database is local to the user's machine; no network boundary exists.
 
 - **Web (server mode):** SDK direct access permitted **only for explicitly declared public tables**. Rules:
+
   1. A table is "public" only if it is listed in a `-- @public-read` comment block at the top of the corresponding SurrealQL schema file (e.g. `backend/schema/<table>.surql`).
   2. SurrealDB session auth must be fully configured before any SDK connection is opened from the web client. The web adapter (in `packages/platform-web`) is responsible for establishing and refreshing the session token.
   3. All writes and all business-logic reads (joins, projections, aggregations that enforce domain invariants) must go through the REST API even for public tables.
@@ -45,6 +49,7 @@ REST/Tauri commands for all mutations and auth. SurrealDB SDK for reads/subscrip
 **CI enforcement:** Every CI run executes `typeshare` and then checks that the working tree is clean (`git diff --exit-code packages/app-core/src/generated/`). The build fails if generated types are stale. Developers must re-run `typeshare` locally before pushing any commit that changes `#[derive(Typeshare)]`-annotated types.
 
 **Versioning:**
+
 - REST: URL-based (`/v1/...`)
 - Tauri commands: same version by convention (command names prefixed `v1_`)
 
@@ -52,16 +57,18 @@ See [ADR-006](./ADR-006-frontend-architecture.md) for the frontend package struc
 
 ---
 
-*Amendment 2026-04-01: Tightened web SurrealDB SDK rules (explicit public-table declaration required; session auth precondition; `-- @public-read` annotation convention). Added CI enforcement for Typeshare codegen freshness. See git log for full diff.*
+_Amendment 2026-04-01: Tightened web SurrealDB SDK rules (explicit public-table declaration required; session auth precondition; `-- @public-read` annotation convention). Added CI enforcement for Typeshare codegen freshness. See git log for full diff._
 
 ## Consequences
 
 **Easier:**
+
 - All mutations go through domain validation — no way for frontend to write invalid state directly to DB
 - Desktop and web share type definitions — one change propagates to both
 - Row-level security in SurrealDB provides a second layer of read access control
 
 **Harder:**
+
 - Every new operation needs both a REST endpoint and a Tauri command (same handler, two registrations)
 - Typeshare requires running the codegen step when Rust API types change; CI enforces freshness via `git diff --exit-code` on `packages/app-core/src/generated/`
 - SurrealDB schema types and Typeshare-generated types must stay in sync manually
