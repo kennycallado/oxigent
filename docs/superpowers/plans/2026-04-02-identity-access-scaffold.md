@@ -278,26 +278,36 @@ git commit -m "feat(shared-kernel): add Criteria<F>, Filter<F>, and Op types"
 
 **Files:**
 - Modify: `backend/crates/identity-access/src/lib.rs`
+- Delete: `backend/crates/identity-access/src/domain.rs` (scaffold leftover)
+- Delete: `backend/crates/identity-access/src/application.rs` (scaffold leftover)
 - Create: `backend/crates/identity-access/src/user/mod.rs`
 - Create: `backend/crates/identity-access/src/user/domain/mod.rs`
 - Create: `backend/crates/identity-access/src/user/domain/role.rs`
 - Create: `backend/crates/identity-access/src/user/domain/user.rs`
 
-- [ ] **Step 1: Replace flat `lib.rs` with module declaration**
+- [ ] **Step 1: Remove scaffold leftovers and replace `lib.rs`**
+
+The existing `domain.rs` and `application.rs` are empty scaffold files that become orphaned
+once `lib.rs` switches to `pub mod user`. Delete them:
+
+```bash
+rm backend/crates/identity-access/src/domain.rs
+rm backend/crates/identity-access/src/application.rs
+```
 
 Replace full content of `backend/crates/identity-access/src/lib.rs`:
 ```rust
 pub mod user;
 ```
 
-- [ ] **Step 2: Create `user/mod.rs`**
+- [ ] **Step 2: Create `user/mod.rs` — domain only for now**
+
+Only declare `domain` here. The remaining submodules are added in their respective tasks
+to avoid compilation failures before the files exist:
 
 ```rust
 // backend/crates/identity-access/src/user/mod.rs
 pub mod domain;
-pub mod application;
-pub mod ports;
-pub mod adapters;
 ```
 
 - [ ] **Step 3: Create `user/domain/mod.rs`**
@@ -582,23 +592,36 @@ impl InMemoryUserRepository {
 
 impl UserRegistry for InMemoryUserRepository {
     fn save(&self, user: &User) -> Result<(), AppError> {
-        self.store.write().unwrap().insert(user.id.to_string(), user.clone());
+        self.store
+            .write()
+            .map_err(|_| AppError::new("E_LOCK", "store lock poisoned"))?
+            .insert(user.id.to_string(), user.clone());
         Ok(())
     }
 
     fn delete(&self, id: &UserId) -> Result<(), AppError> {
-        self.store.write().unwrap().remove(&id.to_string());
+        self.store
+            .write()
+            .map_err(|_| AppError::new("E_LOCK", "store lock poisoned"))?
+            .remove(&id.to_string());
         Ok(())
     }
 }
 
 impl UserFinder for InMemoryUserRepository {
     fn find_by_id(&self, id: &UserId) -> Result<Option<User>, AppError> {
-        Ok(self.store.read().unwrap().get(&id.to_string()).cloned())
+        Ok(self.store
+            .read()
+            .map_err(|_| AppError::new("E_LOCK", "store lock poisoned"))?
+            .get(&id.to_string())
+            .cloned())
     }
 
     fn find_by_email(&self, email: &str) -> Result<Option<User>, AppError> {
-        Ok(self.store.read().unwrap().values()
+        Ok(self.store
+            .read()
+            .map_err(|_| AppError::new("E_LOCK", "store lock poisoned"))?
+            .values()
             .find(|u| u.email == email)
             .cloned())
     }
@@ -606,18 +629,20 @@ impl UserFinder for InMemoryUserRepository {
 
 impl UserSearch for InMemoryUserRepository {
     fn find(&self, criteria: Criteria<UserField>) -> Result<Vec<User>, AppError> {
-        let store = self.store.read().unwrap();
+        let store = self.store
+            .read()
+            .map_err(|_| AppError::new("E_LOCK", "store lock poisoned"))?;
         let results = store.values()
             .filter(|u| {
                 criteria.filters.iter().all(|f| {
-                    let field_val = match f.field {
+                    let field_val = match &f.field {
                         UserField::Email => u.email.clone(),
                         UserField::Role  => u.role.to_string(),
                     };
-                    match f.op {
+                    match &f.op {
                         Op::Eq    => field_val == f.value,
                         Op::NotEq => field_val != f.value,
-                        Op::Like  => field_val.contains(&*f.value),
+                        Op::Like  => field_val.contains(f.value.as_str()),
                         Op::Gt    => field_val > f.value,
                         Op::Lt    => field_val < f.value,
                         Op::Gte   => field_val >= f.value,
@@ -843,8 +868,11 @@ mod tests {
 
     #[test]
     fn register_user_persists_and_returns_user() {
+        use crate::user::ports::UserFinder;
+
+        let repo = InMemoryUserRepository::new();
         let uc = RegisterUser {
-            repository: InMemoryUserRepository::new(),
+            repository: repo.clone(),
             hasher:     PlainPasswordHasher,
         };
         let result = uc.execute(RegisterUserCommand {
@@ -856,6 +884,11 @@ mod tests {
         let user = result.unwrap();
         assert_eq!(user.email, "new@test.com");
         assert_eq!(user.role, Role::Member);
+
+        // Verify the user was actually stored (not just returned)
+        let stored = uc.repository.find_by_id(&user.id).unwrap();
+        assert!(stored.is_some(), "user should be persisted in the store");
+        assert_eq!(stored.unwrap().email, "new@test.com");
     }
 }
 ```
