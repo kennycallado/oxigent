@@ -1,9 +1,11 @@
 # ADR-001: General Architecture
 
 ## Status
+
 Accepted
 
 ## Context
+
 The project requires a kanban/task-management application (similar to Jira) with two distinct access points: a web browser client and a native desktop client. The desktop client adds agent CLI integration (Claude Code, Codex, etc.) not available in the browser context. Both surfaces must share the same domain logic and UI components to avoid divergence and duplication.
 
 ## Options Considered
@@ -22,27 +24,27 @@ Premature for current scale and team size. Adds operational complexity with no b
 Modular monolith Rust backend + shared frontend core (Lit + Siemens iX) + two shells (web via Vite, desktop via Tauri 2).
 
 ```
-┌──────────────────────────────────────────────────────┐
-│               Frontend Shared Core                   │
+┌─────────────────────────────────────────────────────────────┐
+│               Frontend Shared Core                          │
 │  packages/ui  |  packages/app-core  |  packages/features/*  │
-│  Lit + Siemens iX + TypeScript + ports               │
-└──────────────────┬───────────────────────────────────┘
+│       Lit + Siemens iX + TypeScript + ports                 │
+└──────────────────┬──────────────────────────────────────────┘
                    │
       ┌────────────┴────────────┐
       │                         │
-┌─────▼──────────┐     ┌────────▼────────────┐
+┌─────▼───────────┐     ┌───────▼──────────────┐
 │  apps/web       │     │  apps/desktop        │
 │  Vite shell     │     │  Tauri 2 shell       │
 │  platform-web   │     │  platform-desktop    │
 │  adapters       │     │  adapters            │
 │  HTTP/WS        │     │  Tauri commands +    │
 └─────┬───────────┘     │  channels + sidecars │
-      │                 └────────┬────────────┘
+      │                 └────────┬─────────────┘
       │                          │
       └──────────┬───────────────┘
                  │
 ┌────────────────▼─────────────────────────────────────┐
-│            Backend — Rust Modular Monolith            │
+│            Backend — Rust Modular Monolith           │
 │                                                      │
 │  backend/crates/shared-kernel   (shared vocabulary)  │
 │  backend/crates/work-management                      │
@@ -60,6 +62,7 @@ Modular monolith Rust backend + shared frontend core (Lit + Siemens iX) + two sh
 ```
 
 Each backend crate follows DDD + CQRS + hexagonal layering:
+
 - `domain/` — entities, aggregates, value objects, domain events
 - `application/` — command handlers, query handlers
 - `ports/` — repository traits, bus traits, external service traits
@@ -73,11 +76,13 @@ See [ADR-002](./ADR-002-bounded-contexts.md) for bounded context definitions, [A
 ## Consequences
 
 **Easier:**
+
 - Single source of truth for domain logic
 - UI components work identically in both shells
 - New features ship to both surfaces simultaneously
 - Each bounded context can be extracted to a separate service if needed later
 
 **Harder:**
+
 - Port/adapter discipline must be enforced — no shortcuts importing adapters directly from feature code
 - Shell setup is more involved than a simple Vite SPA

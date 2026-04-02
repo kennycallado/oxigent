@@ -1,5 +1,5 @@
 {
-  "name": "@rust-kanban/platform-web",
+  "name": "@oxigent/platform-web",
   "version": "0.1.0",
   "type": "module",
   "main": "src/index.ts",
@@ -9,7 +9,7 @@
     "check": "tsc --noEmit"
   },
   "dependencies": {
-    "@rust-kanban/app-core": "workspace:*"
+    "@oxigent/app-core": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.7.0"

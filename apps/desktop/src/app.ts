@@ -1,6 +1,6 @@
 import { LitElement, html, css } from "lit";
 
-export class RustKanbanApp extends LitElement {
+export class OxigentApp extends LitElement {
   static styles = css`
     :host {
       display: block;
@@ -9,8 +9,8 @@ export class RustKanbanApp extends LitElement {
   `;
 
   render() {
-    return html`<h1>Rust Kanban Desktop</h1>`;
+    return html`<h1>Oxigent</h1>`;
   }
 }
 
-customElements.define("rust-kanban-app", RustKanbanApp);
+customElements.define("oxigent-app", OxigentApp);

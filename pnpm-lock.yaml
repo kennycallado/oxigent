@@ -14,28 +14,28 @@ importers:
 
   apps/desktop:
     dependencies:
-      '@rust-kanban/app-core':
+      '@oxigent/app-core':
         specifier: workspace:*
         version: link:../../packages/app-core
-      '@rust-kanban/feature-agents':
+      '@oxigent/feature-agents':
         specifier: workspace:*
         version: link:../../packages/features/agents
-      '@rust-kanban/feature-boards':
+      '@oxigent/feature-boards':
         specifier: workspace:*
         version: link:../../packages/features/boards
-      '@rust-kanban/feature-projects':
+      '@oxigent/feature-projects':
         specifier: workspace:*
         version: link:../../packages/features/projects
-      '@rust-kanban/feature-settings':
+      '@oxigent/feature-settings':
         specifier: workspace:*
         version: link:../../packages/features/settings
-      '@rust-kanban/feature-tasks':
+      '@oxigent/feature-tasks':
         specifier: workspace:*
         version: link:../../packages/features/tasks
-      '@rust-kanban/platform-desktop':
+      '@oxigent/platform-desktop':
         specifier: workspace:*
         version: link:../../packages/platform-desktop
-      '@rust-kanban/ui':
+      '@oxigent/ui':
         specifier: workspace:*
         version: link:../../packages/ui
       '@tauri-apps/api':
@@ -57,28 +57,28 @@ importers:
 
   apps/web:
     dependencies:
-      '@rust-kanban/app-core':
+      '@oxigent/app-core':
         specifier: workspace:*
         version: link:../../packages/app-core
-      '@rust-kanban/feature-agents':
+      '@oxigent/feature-agents':
         specifier: workspace:*
         version: link:../../packages/features/agents
-      '@rust-kanban/feature-boards':
+      '@oxigent/feature-boards':
         specifier: workspace:*
         version: link:../../packages/features/boards
-      '@rust-kanban/feature-projects':
+      '@oxigent/feature-projects':
         specifier: workspace:*
         version: link:../../packages/features/projects
-      '@rust-kanban/feature-settings':
+      '@oxigent/feature-settings':
         specifier: workspace:*
         version: link:../../packages/features/settings
-      '@rust-kanban/feature-tasks':
+      '@oxigent/feature-tasks':
         specifier: workspace:*
         version: link:../../packages/features/tasks
-      '@rust-kanban/platform-web':
+      '@oxigent/platform-web':
         specifier: workspace:*
         version: link:../../packages/platform-web
-      '@rust-kanban/ui':
+      '@oxigent/ui':
         specifier: workspace:*
         version: link:../../packages/ui
       lit:
@@ -100,10 +100,10 @@ importers:
 
   packages/features/agents:
     dependencies:
-      '@rust-kanban/app-core':
+      '@oxigent/app-core':
         specifier: workspace:*
         version: link:../../app-core
-      '@rust-kanban/ui':
+      '@oxigent/ui':
         specifier: workspace:*
         version: link:../../ui
       lit:
@@ -116,10 +116,10 @@ importers:
 
   packages/features/boards:
     dependencies:
-      '@rust-kanban/app-core':
+      '@oxigent/app-core':
         specifier: workspace:*
         version: link:../../app-core
-      '@rust-kanban/ui':
+      '@oxigent/ui':
         specifier: workspace:*
         version: link:../../ui
       lit:
@@ -132,10 +132,10 @@ importers:
 
   packages/features/projects:
     dependencies:
-      '@rust-kanban/app-core':
+      '@oxigent/app-core':
         specifier: workspace:*
         version: link:../../app-core
-      '@rust-kanban/ui':
+      '@oxigent/ui':
         specifier: workspace:*
         version: link:../../ui
       lit:
@@ -148,10 +148,10 @@ importers:
 
   packages/features/settings:
     dependencies:
-      '@rust-kanban/app-core':
+      '@oxigent/app-core':
         specifier: workspace:*
         version: link:../../app-core
-      '@rust-kanban/ui':
+      '@oxigent/ui':
         specifier: workspace:*
         version: link:../../ui
       lit:
@@ -164,10 +164,10 @@ importers:
 
   packages/features/tasks:
     dependencies:
-      '@rust-kanban/app-core':
+      '@oxigent/app-core':
         specifier: workspace:*
         version: link:../../app-core
-      '@rust-kanban/ui':
+      '@oxigent/ui':
         specifier: workspace:*
         version: link:../../ui
       lit:
@@ -180,7 +180,7 @@ importers:
 
   packages/platform-desktop:
     dependencies:
-      '@rust-kanban/app-core':
+      '@oxigent/app-core':
         specifier: workspace:*
         version: link:../app-core
       '@tauri-apps/api':
@@ -193,7 +193,7 @@ importers:
 
   packages/platform-web:
     dependencies:
-      '@rust-kanban/app-core':
+      '@oxigent/app-core':
         specifier: workspace:*
         version: link:../app-core
     devDependencies:

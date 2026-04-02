@@ -1,10 +1,10 @@
 {
-  "name": "rust-kanban",
+  "name": "oxigent",
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "pnpm --filter @rust-kanban/web dev",
-    "dev:desktop": "pnpm --filter @rust-kanban/desktop dev",
+    "dev": "pnpm --filter @oxigent/web dev",
+    "dev:desktop": "pnpm --filter @oxigent/desktop dev",
     "build": "pnpm -r build",
     "check": "pnpm -r check",
     "lint": "pnpm -r lint"

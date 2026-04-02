@@ -1,5 +1,5 @@
 {
-  description = "rust-kanban";
+  description = "oxigent";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
@@ -46,34 +46,34 @@
 
         cargoArtifacts = craneLib.buildDepsOnly commonArgs;
 
-        rust-kanban = craneLib.buildPackage (
+        oxigent = craneLib.buildPackage (
           commonArgs
           // {
             inherit cargoArtifacts;
-            pname = "rust-kanban";
+            pname = "oxigent";
           }
         );
       in
       {
         checks = {
-          inherit rust-kanban;
-          rust-kanban-clippy = craneLib.cargoClippy (
+          inherit oxigent;
+          oxigent-clippy = craneLib.cargoClippy (
             commonArgs
             // {
               inherit cargoArtifacts;
               cargoClippyExtraArgs = "--all-targets -- --deny warnings";
             }
           );
-          rust-kanban-doc = craneLib.cargoDoc (
+          oxigent-doc = craneLib.cargoDoc (
             commonArgs
             // {
               inherit cargoArtifacts;
             }
           );
-          rust-kanban-fmt = craneLib.cargoFmt {
+          oxigent-fmt = craneLib.cargoFmt {
             inherit src;
           };
-          rust-kanban-nextest = craneLib.cargoNextest (
+          oxigent-nextest = craneLib.cargoNextest (
             commonArgs
             // {
               inherit cargoArtifacts;
@@ -83,14 +83,14 @@
           );
         };
 
-        packages.default = rust-kanban;
+        packages.default = oxigent;
 
         apps.default = flake-utils.lib.mkApp {
-          drv = rust-kanban;
+          drv = oxigent;
         };
 
         devShells.default = craneLib.devShell {
-          inputsFrom = [ rust-kanban ];
+          inputsFrom = [ oxigent ];
           packages = with pkgs; [
             rustToolchain
             bacon

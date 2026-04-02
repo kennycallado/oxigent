@@ -1,5 +1,5 @@
 {
-  "name": "@rust-kanban/feature-tasks",
+  "name": "@oxigent/feature-tasks",
   "version": "0.1.0",
   "type": "module",
   "main": "src/index.ts",
@@ -9,8 +9,8 @@
     "check": "tsc --noEmit"
   },
   "dependencies": {
-    "@rust-kanban/app-core": "workspace:*",
-    "@rust-kanban/ui": "workspace:*",
+    "@oxigent/app-core": "workspace:*",
+    "@oxigent/ui": "workspace:*",
     "lit": "^3.2.0"
   },
   "devDependencies": {

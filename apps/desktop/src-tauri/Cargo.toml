@@ -1,5 +1,5 @@
 [package]
-name = "rust-kanban-desktop"
+name = "oxigent-desktop"
 version.workspace = true
 edition.workspace = true
 

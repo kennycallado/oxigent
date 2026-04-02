@@ -1,5 +1,5 @@
 {
-  "name": "@rust-kanban/desktop",
+  "name": "@oxigent/desktop",
   "version": "0.1.0",
   "type": "module",
   "scripts": {
@@ -9,14 +9,14 @@
     "check": "tsc --noEmit"
   },
   "dependencies": {
-    "@rust-kanban/app-core": "workspace:*",
-    "@rust-kanban/ui": "workspace:*",
-    "@rust-kanban/platform-desktop": "workspace:*",
-    "@rust-kanban/feature-tasks": "workspace:*",
-    "@rust-kanban/feature-boards": "workspace:*",
-    "@rust-kanban/feature-projects": "workspace:*",
-    "@rust-kanban/feature-agents": "workspace:*",
-    "@rust-kanban/feature-settings": "workspace:*",
+    "@oxigent/app-core": "workspace:*",
+    "@oxigent/ui": "workspace:*",
+    "@oxigent/platform-desktop": "workspace:*",
+    "@oxigent/feature-tasks": "workspace:*",
+    "@oxigent/feature-boards": "workspace:*",
+    "@oxigent/feature-projects": "workspace:*",
+    "@oxigent/feature-agents": "workspace:*",
+    "@oxigent/feature-settings": "workspace:*",
     "@tauri-apps/api": "^2",
     "lit": "^3.2.0"
   },
