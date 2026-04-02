@@ -41,6 +41,7 @@
 
         commonArgs = {
           inherit src;
+          pname = "oxigent";
           strictDeps = true;
         };
 
