@@ -1,6 +1,7 @@
 // backend/crates/shared-kernel/src/errors.rs
 use serde::{Deserialize, Serialize};
 
+// TODO(typeshare): add #[derive(Typeshare)] once typeshare dep is wired in workspace (ADR-009)
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AppError {
     pub code: String,
@@ -8,6 +9,7 @@ pub struct AppError {
     pub details: Vec<ErrorDetail>,
 }
 
+// TODO(typeshare): add #[derive(Typeshare)] once typeshare dep is wired in workspace (ADR-009)
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ErrorDetail {
     pub field: String,
