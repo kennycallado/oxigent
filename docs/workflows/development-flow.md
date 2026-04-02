@@ -14,7 +14,9 @@ All work is tracked via GitHub Issues. No branch without an issue; no merge with
 
 - Go to [GitHub Projects board](https://github.com/users/kennycallado/projects/2)
 - Pick an issue from `Todo` in the current milestone
-- Assign it to yourself and move it to `In Progress`
+- Assign it to yourself (or set the `Agent` field if a subagent is taking it) and move it to `In Progress`
+- Set `Priority` if not already set (see table below)
+- If the issue is blocked by a dependency, set `Blocked: Yes` and note the reason in the issue body
 
 ---
 
@@ -82,12 +84,27 @@ The issue closes automatically when the PR is merged (via `Closes #N` in the PR 
 
 ## 6. Board hygiene
 
+### Status
+
 | State | When to set it |
 |-------|----------------|
 | Todo | Issue created, not started |
 | In Progress | Branch created, work started |
 | In Review | PR opened |
 | Done | PR merged (automatic via `Closes #N`) |
+
+### Additional fields
+
+| Field | Values | When to set |
+|-------|--------|-------------|
+| `Priority` | `Critical` / `High` / `Medium` / `None` | At triage or when picking the issue |
+| `Blocked` | `Yes` / `No` | When a dependency prevents progress; note the blocker in the issue body |
+| `Agent` | e.g. `@agent_gpt` | When a subagent is assigned to the issue (set before starting work) |
+
+Rules:
+- An issue with `Blocked: Yes` should not be in `In Progress` unless the blocker is being resolved
+- `Agent` is cleared when the work is merged (issue closes)
+- `Priority: Critical` means the issue must be resolved before any other work in the milestone
 
 ---
 
