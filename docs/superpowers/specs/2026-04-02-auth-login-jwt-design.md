@@ -32,6 +32,10 @@ Implement authentication in the `api` crate:
 
 JWT and session management are **transport/infrastructure concerns** and live in `api`. The `identity-access` crate stays pure domain.
 
+**`AppState` threading:** `AppState` is wrapped in `Arc` and must be `Send + Sync`. All fields (`AuthenticateUser`, `JwtService`, `DenyList`) must satisfy these bounds; the `DenyList` uses `Arc<Mutex<...>>` to satisfy them.
+
+**`AppError → HTTP response`:** The `api` crate implements `axum::response::IntoResponse` for `AppError`, mapping error codes to HTTP status codes per ADR-009. This impl lives in `api/src/error.rs`.
+
 ---
 
 ## 3. Module Structure
@@ -47,20 +51,21 @@ src/user/
     authenticate.rs             # NEW: AuthenticateUser { find_user, verify_password }
 ```
 
-**`AuthenticateUser`** service:
+**`AuthenticateUser<F: UserFinder, H: PasswordHasher>`** service (mirrors `RegisterUser<R, H>` pattern):
 - Input: `email: String`, `password: String`
-- Looks up user by email via `UserSearch` port (filtering by email field)
-- Verifies password via `PasswordHasher` port
+- Looks up user by email via `UserFinder::find_by_email` — returns `Option<User>` directly (no `Criteria` needed)
+- Verifies password via `PasswordHasher::verify`
 - Returns `User` on success, `AppError { code: "E_UNAUTHORIZED", ... }` on failure
-- Note: always returns `E_UNAUTHORIZED` for both "user not found" and "wrong password" to avoid user enumeration
+- Always returns `E_UNAUTHORIZED` for both "user not found" and "wrong password" to avoid user enumeration
 
 ### `api` crate new structure
 
 ```
 api/src/
   lib.rs              # build_router(state: AppState) → Router
-  config.rs           # AppConfig { jwt_secret, jwt_expiry_secs } — reads from env
-  state.rs            # AppState { identity_svc, jwt_svc, deny_list }
+  config.rs           # AppConfig { jwt_secret, jwt_expiry_secs } — reads from env; panics if JWT_SECRET absent/too short
+  state.rs            # AppState: Arc-wrapped, Send + Sync; holds identity_svc, jwt_svc, deny_list
+  error.rs            # IntoResponse impl for AppError (maps codes → HTTP status + JSON body)
   jwt/
     mod.rs            # JwtService: issue(user) → String, validate(token) → Claims
     claims.rs         # Claims { sub, role, jti, exp, iat }
@@ -106,14 +111,14 @@ api/src/
 ```json
 {
   "sub": "<user_id>",
-  "role": "admin | user",
+  "role": "Admin | Member | Viewer",
   "jti": "<uuid-v4>",
   "iat": 1712000000,
   "exp": 1712086400
 }
 ```
 
-Algorithm: HS256. Secret: `JWT_SECRET` env var (minimum 32 bytes recommended). Default expiry: 86400s (24h), overridable via `JWT_EXPIRY_SECS`. No issuer/audience validation in Fase 1 (deferred to production hardening milestone).
+Algorithm: HS256. Secret: `JWT_SECRET` env var (minimum 32 bytes; the binary **panics at startup** if the env var is absent or shorter than 32 bytes — fail-fast, not fail-at-runtime). Default expiry: 86400s (24h), overridable via `JWT_EXPIRY_SECS`. No issuer/audience validation in Fase 1 (deferred to production hardening milestone).
 
 ### Typeshare types
 
@@ -167,7 +172,7 @@ All added to the workspace `Cargo.toml` where possible.
 - `Argon2PasswordHasher`: `hash` then `verify` round-trip passes; wrong password returns `false`
 - `AuthenticateUser`: happy path returns `User`; wrong password returns `E_UNAUTHORIZED`; unknown user returns `E_UNAUTHORIZED`
 
-### `api` integration tests (axum `TestClient` via `axum-test` crate)
+### `api` integration tests (using `tower::ServiceExt` with `axum` test utilities)
 
 - `POST /v1/auth/login` with valid credentials → 200, response contains `token`, token is valid JWT
 - `POST /v1/auth/login` with wrong password → 401 `E_UNAUTHORIZED`
