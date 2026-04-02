@@ -49,6 +49,7 @@ Never work on issues outside the current milestone.
 - Spec + code review with `@agent_glm`
 - Do not proceed past a task if critical or important issues exist and are not addressed in a later task
 - If a subagent needs ULTRATHINK, instruct it to read the proper documentation.
+- **Postmortem required:** after every superpowers-driven implementation, write a postmortem in `docs/postmortems/YYYY-MM-DD-topic.md` covering: what was done, what went well, what went wrong, and lessons learned. Do not mark the issue as complete until the postmortem is written.
 
 ## Context-Mode Rules
 
