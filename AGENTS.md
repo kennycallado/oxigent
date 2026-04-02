@@ -38,7 +38,7 @@ Before starting any issue, update the GitHub Projects board:
 On completion (PR merged):
 
 - The issue closes automatically via `Closes #N` in the PR body
-- No manual board cleanup needed
+- **Move the issue to Done** on the project board — this is NOT automatic. Do it as part of post-merge cleanup.
 
 Never start work on an issue with `Blocked: Yes` unless you are actively resolving the blocker.
 Never work on issues outside the current milestone.

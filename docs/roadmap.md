@@ -172,7 +172,7 @@ El project board [Oxigent Roadmap](https://github.com/users/kennycallado/project
 
 | Campo         | Valores                               | Uso                      |
 | ------------- | ------------------------------------- | ------------------------ |
-| **Status**    | Todo → In Progress → In Review → Done | Ciclo de vida del issue  |
+| **Status**    | Todo → In Progress → In Review → Done | Ciclo de vida del issue. **Done es manual** — mover tras confirmar merge |
 | **Priority**  | Critical / High / Medium / None       | Priorización             |
 | **Blocked**   | Yes / No                              | Dependencias bloqueantes |
 | **Agent**     | Libre (e.g. `@agent_gpt`)             | Subagente asignado       |

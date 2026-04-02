@@ -124,6 +124,20 @@ git checkout main && git pull
 git worktree remove <worktree-path>   # if using worktrees
 ```
 
+Then **move the issue to Done** on the project board:
+
+```bash
+gh project item-edit --id <item-id> --project-id <project-id> \
+  --field-id <status-field-id> --single-select-option-id <done-option-id>
+```
+
+Then **update `docs/roadmap.md`** to reflect the new state:
+
+- Change the issue status from `OPEN` to `**DONE**` in the corresponding phase table
+- Update counts in "Estado global" (cerrados +1, abiertos -1)
+- Update the phase progress row (e.g. `2 / 7 cerrados`)
+- Update the "Última actualización" date at the top of the file
+
 If using the `finishing-a-development-branch` skill, follow it instead — it handles worktree cleanup automatically.
 
 ---
@@ -137,7 +151,7 @@ If using the `finishing-a-development-branch` skill, follow it instead — it ha
 | Todo        | Issue created, not started            |
 | In Progress | Branch created, work started          |
 | In Review   | PR opened                             |
-| Done        | PR merged (automatic via `Closes #N`) |
+| Done        | After PR merged — **move manually** (agent or human) |
 
 ### Additional fields
 
@@ -152,6 +166,7 @@ Rules:
 - An issue with `Blocked: Yes` should not be in `In Progress` unless the blocker is being resolved
 - `Agent` is cleared when the work is merged (issue closes)
 - `Priority: Critical` means the issue must be resolved before any other work in the milestone
+- **Done is NOT automatic.** The agent or human must move the issue to Done after confirming the PR is merged and the issue is closed. This is part of the post-merge cleanup (section 5c).
 
 ---
 
