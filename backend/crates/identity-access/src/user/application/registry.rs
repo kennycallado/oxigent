@@ -28,7 +28,7 @@ impl<R: UserRegistry, H: PasswordHasher> RegisterUser<R, H> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::user::adapters::{InMemoryUserRepository, PlainPasswordHasher};
+    use crate::user::adapters::{Argon2PasswordHasher, InMemoryUserRepository};
     use crate::user::ports::UserFinder;
 
     #[test]
@@ -36,7 +36,7 @@ mod tests {
         let repo = InMemoryUserRepository::new();
         let uc = RegisterUser {
             repository: repo.clone(),
-            hasher: PlainPasswordHasher,
+            hasher: Argon2PasswordHasher,
         };
         let result = uc.execute(RegisterUserCommand {
             email: "new@test.com".into(),
