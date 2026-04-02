@@ -47,7 +47,7 @@ Never work on issues outside the current milestone.
 - Delegate implementation to `@agent_gpt`
 - Spec + code review with `@agent_glm`
 - Do not proceed past a task if critical or important issues exist and are not addressed in a later task
-- If a subagent needs ULTRATHINK, instruct it to read `AGENTS.md`
+- If a subagent needs ULTRATHINK, instruct it to read the proper documentation.
 
 ## Context-Mode Rules
 
