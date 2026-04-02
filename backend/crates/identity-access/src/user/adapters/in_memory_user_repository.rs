@@ -59,6 +59,7 @@ impl UserFinder for InMemoryUserRepository {
 
 impl UserSearch for InMemoryUserRepository {
     fn find(&self, criteria: Criteria<UserField>) -> Result<Vec<User>, AppError> {
+        // TODO: apply criteria.limit and criteria.offset after filtering
         let store = self
             .store
             .read()
