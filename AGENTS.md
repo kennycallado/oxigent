@@ -18,11 +18,13 @@
 ## Mandatory Workflow
 
 - Read `docs/workflows/development-flow.md` and `docs/workflows/conventions.md` before any task
-- Issue → branch from main → commits → PR → review → squash merge
+- Issue → branch from main → commits → PR → **notify human** → wait for review → postmortem → merge → cleanup
 - Commit format: `type(scope): description` (see conventions.md for valid scopes)
 - `Closes #N` in PR body, never in commits
 - Pre-push checks: `cargo clippy && cargo test` | `pnpm lint && pnpm test`
 - Only work on the current milestone unless explicitly told otherwise
+- **After PR is created:** stop, write postmortem, notify human, wait for instructions. Do NOT merge or start new work autonomously.
+- **Post-merge:** pull main, cleanup worktree/branch. See `development-flow.md` sections 5a–5c for full protocol.
 
 ## Board Protocol (agents)
 
@@ -47,10 +49,9 @@ Never work on issues outside the current milestone.
 - Worktree from `main`, activate ORCHESTRATE
 - Delegate implementation to `@agent_gpt`
 - Spec + code review with `@agent_glm`
-- Don't take the next task until the current one pass review without critical or important issues unless will be addressed in a later task.
 - Do not proceed past a task if critical or important issues exist and are not addressed in a later task
 - If a subagent needs ULTRATHINK, instruct it to read the proper documentation.
-- **Postmortem required:** after every superpowers-driven implementation, write a postmortem in `docs/postmortems/YYYY-MM-DD-topic.md` covering: what was done, what went well, what went wrong, and lessons learned. Do not mark the issue as complete until the postmortem is written.
+- **Postmortem required:** after every superpowers-driven implementation, write a postmortem in `docs/postmortems/YYYY-MM-DD-topic.md` covering: what was done, what went well, what went wrong, and lessons learned. Do not mark the issue as complete until the postmortem is written. Write it **before merge**, not after.
 
 ## Context-Mode Rules
 

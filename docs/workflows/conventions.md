@@ -6,15 +6,15 @@
 <type>/<issue-number>-<short-description>
 ```
 
-| Type | When to use |
-|------|-------------|
-| `feat` | New feature or capability |
-| `fix` | Bug fix |
-| `docs` | Documentation only |
-| `refactor` | Code change with no behavior change |
-| `test` | Adding or fixing tests |
-| `infra` | CI, tooling, build system |
-| `chore` | Dependency updates, minor maintenance |
+| Type       | When to use                           |
+| ---------- | ------------------------------------- |
+| `feat`     | New feature or capability             |
+| `fix`      | Bug fix                               |
+| `docs`     | Documentation only                    |
+| `refactor` | Code change with no behavior change   |
+| `test`     | Adding or fixing tests                |
+| `infra`    | CI, tooling, build system             |
+| `chore`    | Dependency updates, minor maintenance |
 
 Examples:
 
@@ -26,6 +26,7 @@ infra/13-github-actions-pipeline
 ```
 
 Rules:
+
 - Always include the issue number
 - Use kebab-case for the description
 - Keep it short (3-5 words)
@@ -52,24 +53,24 @@ Same values as branch types: `feat`, `fix`, `docs`, `refactor`, `test`, `infra`,
 
 The crate or package being changed:
 
-| Scope | What it covers |
-|-------|---------------|
-| `work-management` | `backend/crates/work-management` |
-| `identity-access` | `backend/crates/identity-access` |
-| `planning` | `backend/crates/planning` |
-| `agent-execution` | `backend/crates/agent-execution` |
-| `integrations` | `backend/crates/integrations` |
-| `shared-kernel` | `backend/crates/shared-kernel` |
-| `api` | `backend/crates/api` |
-| `app-core` | `packages/app-core` |
-| `features` | `packages/features/*` |
-| `platform-web` | `packages/platform-web` |
-| `platform-desktop` | `packages/platform-desktop` |
-| `ui` | `packages/ui` |
-| `web` | `apps/web` |
-| `desktop` | `apps/desktop` |
-| `ci` | GitHub Actions workflows |
-| `adr` | `docs/adr/` |
+| Scope              | What it covers                   |
+| ------------------ | -------------------------------- |
+| `work-management`  | `backend/crates/work-management` |
+| `identity-access`  | `backend/crates/identity-access` |
+| `planning`         | `backend/crates/planning`        |
+| `agent-execution`  | `backend/crates/agent-execution` |
+| `integrations`     | `backend/crates/integrations`    |
+| `shared-kernel`    | `backend/crates/shared-kernel`   |
+| `api`              | `backend/crates/api`             |
+| `app-core`         | `packages/app-core`              |
+| `features`         | `packages/features/*`            |
+| `platform-web`     | `packages/platform-web`          |
+| `platform-desktop` | `packages/platform-desktop`      |
+| `ui`               | `packages/ui`                    |
+| `web`              | `apps/web`                       |
+| `desktop`          | `apps/desktop`                   |
+| `ci`               | GitHub Actions workflows         |
+| `adr`              | `docs/adr/`                      |
 
 ### Examples
 
@@ -133,8 +134,8 @@ for both features and bugs.
 
 When working on an issue, keep these fields up to date on the board:
 
-| Field | Values | Rule |
-|-------|--------|------|
-| `Priority` | `Critical` / `High` / `Medium` / `None` | Set at triage; `Critical` blocks all other work in the milestone |
-| `Blocked` | `Yes` / `No` | Set to `Yes` if a dependency prevents progress; document the blocker in the issue body |
-| `Agent` | e.g. `@agent_gpt` | Set to the subagent name before starting work; clear on merge |
+| Field      | Values                                  | Rule                                                                                   |
+| ---------- | --------------------------------------- | -------------------------------------------------------------------------------------- |
+| `Priority` | `Critical` / `High` / `Medium` / `None` | Set at triage; `Critical` blocks all other work in the milestone                       |
+| `Blocked`  | `Yes` / `No`                            | Set to `Yes` if a dependency prevents progress; document the blocker in the issue body |
+| `Agent`    | e.g. `@agent_gpt`                       | Set to the subagent name before starting work; clear on merge                          |

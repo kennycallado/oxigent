@@ -80,6 +80,49 @@ Move the issue to `In Review` on the board.
 
 The issue closes automatically when the PR is merged (via `Closes #N` in the PR body).
 
+### 5a. Agent: Post-PR protocol
+
+After opening a PR, the agent **must**:
+
+1. **Notify the human** with a summary:
+   ```
+   PR #N listo para review: <URL>
+   Issue #<N>: <title>
+   Rama: <branch-name>
+   Resumen: <1-2 líneas de qué se hizo>
+   Checks: <tests, clippy status>
+   ```
+2. **Write the postmortem** in `docs/postmortems/YYYY-MM-DD-<topic>.md` (see AGENTS.md)
+3. **Stop and wait** for the human to review
+
+The agent must **NOT** merge or take another issue until the human responds.
+
+### 5b. Human: Review and decide
+
+The human reviews the PR (or requests `@agent_glm` review). Two options:
+
+| Option | Human says | Agent executes |
+|--------|-----------|----------------|
+| **A: Merge manual** | "listo", "merged" | Pull main + cleanup worktree |
+| **B: Delegate merge** | "merge #N y cleanup" | Postmortem → squash merge → pull main → cleanup worktree |
+
+### 5c. Agent: Post-merge cleanup
+
+Regardless of who merges, the agent performs cleanup **after** the postmortem is written:
+
+```bash
+# Option B only: merge the PR
+gh pr merge <N> --squash --delete-branch \
+  --subject "<conventional-commit-title>" \
+  --body "<PR-description>"
+
+# Always:
+git checkout main && git pull
+git worktree remove <worktree-path>   # if using worktrees
+```
+
+If using the `finishing-a-development-branch` skill, follow it instead — it handles worktree cleanup automatically.
+
 ---
 
 ## 6. Board hygiene
