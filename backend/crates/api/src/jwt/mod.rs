@@ -25,12 +25,18 @@ impl JwtService {
     pub fn issue(&self, user: &User) -> Result<String, AppError> {
         let now = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
+            .map_err(|_| AppError::new("E_INTERNAL", "system clock error"))?
             .as_secs();
+
+        let role = match user.role {
+            identity_access::user::domain::Role::Admin => "Admin",
+            identity_access::user::domain::Role::Member => "Member",
+            identity_access::user::domain::Role::Viewer => "Viewer",
+        };
 
         let claims = Claims {
             sub: user.id.to_string(),
-            role: format!("{:?}", user.role),
+            role: role.to_string(),
             jti: Uuid::new_v4().to_string(),
             iat: now,
             exp: now + self.expiry_secs,
