@@ -34,6 +34,7 @@ Before starting any issue, update the GitHub Projects board:
 4. If blocked by a dependency, set `Blocked: Yes` and add a note to the issue body explaining the blocker
 
 On completion (PR merged):
+
 - The issue closes automatically via `Closes #N` in the PR body
 - No manual board cleanup needed
 
