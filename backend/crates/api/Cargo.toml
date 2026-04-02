@@ -5,6 +5,17 @@ edition.workspace = true
 
 [dependencies]
 shared-kernel = { path = "../shared-kernel" }
+identity-access = { path = "../identity-access" }
+axum = { workspace = true }
+jsonwebtoken = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+uuid = { workspace = true }
 tokio = { workspace = true }
+tower = { version = "0.5", features = ["util"] }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
+
+[dev-dependencies]
+http-body-util = "0.1"
+tower = { version = "0.5", features = ["util"] }

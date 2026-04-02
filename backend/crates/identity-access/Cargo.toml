@@ -7,3 +7,4 @@ edition.workspace = true
 shared-kernel = { path = "../shared-kernel" }
 serde = { workspace = true }
 uuid = { workspace = true }
+argon2 = "0.5"
