@@ -28,7 +28,7 @@ impl std::fmt::Display for UserId {
 pub struct User {
     pub id: UserId,
     pub email: String,
-    pub password_hash: String,
+    pub password_hash: String, // TODO(#2): restrict visibility once PasswordHasher port is used end-to-end
     pub role: Role,
 }
 
