@@ -3,6 +3,7 @@ use shared_kernel::prelude::AppError;
 use crate::user::domain::User;
 use crate::user::ports::{PasswordHasher, UserFinder};
 
+// TODO: add input validation (non-empty email/password) — see RegisterUserCommand for parity
 pub struct AuthenticateUserCommand {
     pub email: String,
     pub password: String,
@@ -87,7 +88,7 @@ mod tests {
 
     #[test]
     fn authenticate_unknown_email_returns_unauthorized() {
-        let (repo, _) = setup();
+        let (repo, _hasher) = setup();
         let svc = AuthenticateUser {
             finder: repo,
             hasher: Argon2PasswordHasher,
