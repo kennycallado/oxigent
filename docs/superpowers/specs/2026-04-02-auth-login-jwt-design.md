@@ -48,10 +48,11 @@ src/user/
 ```
 
 **`AuthenticateUser`** service:
-- Input: `username: String`, `password: String`
-- Looks up user via `UserFinder` port
+- Input: `email: String`, `password: String`
+- Looks up user by email via `UserSearch` port (filtering by email field)
 - Verifies password via `PasswordHasher` port
 - Returns `User` on success, `AppError { code: "E_UNAUTHORIZED", ... }` on failure
+- Note: always returns `E_UNAUTHORIZED` for both "user not found" and "wrong password" to avoid user enumeration
 
 ### `api` crate new structure
 
@@ -79,7 +80,7 @@ api/src/
 
 **Request** (JSON body):
 ```json
-{ "username": "alice", "password": "secret" }
+{ "email": "alice@example.com", "password": "secret" }
 ```
 
 **Response 200** (JSON body):
@@ -88,8 +89,8 @@ api/src/
 ```
 
 **Errors:**
-- `400 Bad Request` — `E_VALIDATION`: missing `username` or `password`
-- `401 Unauthorized` — `E_UNAUTHORIZED`: wrong credentials
+- `400 Bad Request` — `E_VALIDATION`: missing `email` or `password`; `details` array carries field-level info (e.g. `[{ "field": "email", "message": "required" }]`)
+- `401 Unauthorized` — `E_UNAUTHORIZED`: wrong credentials (same error for unknown email and wrong password — no enumeration)
 
 ### `POST /v1/auth/logout`
 
@@ -112,7 +113,7 @@ api/src/
 }
 ```
 
-Algorithm: HS256. Secret: `JWT_SECRET` env var. Default expiry: 86400s (24h), overridable via `JWT_EXPIRY_SECS`.
+Algorithm: HS256. Secret: `JWT_SECRET` env var (minimum 32 bytes recommended). Default expiry: 86400s (24h), overridable via `JWT_EXPIRY_SECS`. No issuer/audience validation in Fase 1 (deferred to production hardening milestone).
 
 ### Typeshare types
 
@@ -135,13 +136,13 @@ Axum middleware applied to protected route groups (not to `/v1/auth/*`):
 
 | Situation                        | Code            | HTTP |
 |----------------------------------|-----------------|------|
-| Missing username/password field  | `E_VALIDATION`  | 400  |
+| Missing email/password field     | `E_VALIDATION`  | 400  |
 | Wrong credentials                | `E_UNAUTHORIZED`| 401  |
 | Token missing / invalid / expired| `E_UNAUTHORIZED`| 401  |
 | Token revoked (in deny-list)     | `E_UNAUTHORIZED`| 401  |
 | Argon2 internal failure          | `E_INTERNAL`    | 500  |
 
-`E_INTERNAL` responses log full context server-side and return a generic message to the client (no internal details exposed).
+`E_INTERNAL` responses log full context server-side and return a generic message to the client (no internal details exposed). `E_VALIDATION` responses include an optional `details` array with field-level info.
 
 ---
 
@@ -166,16 +167,42 @@ All added to the workspace `Cargo.toml` where possible.
 - `Argon2PasswordHasher`: `hash` then `verify` round-trip passes; wrong password returns `false`
 - `AuthenticateUser`: happy path returns `User`; wrong password returns `E_UNAUTHORIZED`; unknown user returns `E_UNAUTHORIZED`
 
-### `api` integration tests (axum `TestClient`)
+### `api` integration tests (axum `TestClient` via `axum-test` crate)
 
 - `POST /v1/auth/login` with valid credentials → 200, response contains `token`, token is valid JWT
 - `POST /v1/auth/login` with wrong password → 401 `E_UNAUTHORIZED`
-- `POST /v1/auth/login` with missing `password` field → 400 `E_VALIDATION`
-- `POST /v1/auth/logout` with valid token → 204; subsequent middleware check → 401
+- `POST /v1/auth/login` with missing `password` field → 400 `E_VALIDATION` with `details` array
+- `POST /v1/auth/logout` with valid token → 204; subsequent middleware check on protected route → 401
 - `POST /v1/auth/logout` without `Authorization` header → 401
+- `POST /v1/auth/logout` with already-revoked token → 401 (non-idempotent by design)
 
 ---
 
-## 9. Exit Criterion
+## 9. Tauri Command Parity (ADR-007)
+
+Per ADR-007, every REST endpoint has an equivalent Tauri command with identical request/response types.
+
+| REST endpoint             | Tauri command          |
+|---------------------------|------------------------|
+| `POST /v1/auth/login`     | `v1_auth_login`        |
+| `POST /v1/auth/logout`    | `v1_auth_logout`       |
+
+Both commands use the same `LoginRequest` / `LoginResponse` Typeshare types. The desktop adapter calls these Tauri commands instead of HTTP. The `api` crate exposes handler functions that both the Axum router and the Tauri command layer call directly (no HTTP hop).
+
+---
+
+## 10. Deny-List Constraints
+
+The in-memory deny-list is a deliberate Fase 1 simplification. Known limitations:
+
+- **Single-process scope:** tokens revoked in one process instance are not revoked in others (no cross-instance coordination).
+- **Non-persistent:** the deny-list is cleared on process restart; revoked tokens become valid again.
+- **Unbounded growth:** JTI entries accumulate. A background cleanup task removes entries whose `exp` timestamp has passed (run on every insert, or on a timer). This keeps memory bounded without requiring external infrastructure.
+
+The `DenyList` interface is designed to be replaced with a Redis-backed adapter in a later milestone without changing callers.
+
+---
+
+## 11. Exit Criterion
 
 `POST /v1/auth/login` returns a valid JWT token for an existing user with correct credentials.
