@@ -1,16 +1,11 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Default)]
 pub enum Role {
     Admin,
+    #[default]
     Member,
     Viewer,
-}
-
-impl Default for Role {
-    fn default() -> Self {
-        Self::Member
-    }
 }
 
 impl std::fmt::Display for Role {
